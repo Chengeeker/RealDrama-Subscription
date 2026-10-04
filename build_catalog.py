@@ -35,7 +35,7 @@ SOURCES = [
            credentialGroup="bilibili", credentialDomains=["api.bilibili.com"]),
     source("bilibili-live", "Bilibili 直播", ["bilibili-live"],
            ["api.bilibili.com", "api.live.bilibili.com", "live.bilibili.com"],
-           BASIC + ["live"], kind="live", version="0.1.0", license="MIT",
+           BASIC + ["live"], kind="live", version="0.1.1", license="MIT",
            credentialGroup="bilibili", credentialRequired=False,
            credentialDomains=["api.live.bilibili.com"],
            description="公开直播推荐、关注和分区；关注列表可选 Cookie 登录"),
@@ -97,7 +97,7 @@ def main():
     ]
     for identifier, name, members in groups:
         base = dict(packages[members[0]])
-        bundle_version = {"douyin": "0.2.1", "bilibili": "0.3.0"}.get(identifier, "0.2.0")
+        bundle_version = {"douyin": "0.2.1", "bilibili": "0.3.1"}.get(identifier, "0.2.0")
         base.update(id=identifier, name=name, api=2, version=bundle_version,
                     description="组合订阅，子项独立开关；需要支持组合订阅的客户端",
                     domains=sorted({host for key in members for host in packages[key]["domains"]}),

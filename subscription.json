@@ -179,7 +179,7 @@
       "api": 2,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "credentialDomains": [
         "api.bilibili.com"
       ],
@@ -256,7 +256,7 @@
         }
       ],
       "url": "sources/bilibili.json",
-      "sha256": "d25e9d5957dd17a0de79cb748431892771b9d03a9f7186d4681cc0b9c0f82977"
+      "sha256": "4d109243f17694468b11216e57267b401b636ee89ca4a0d2ef666e1a14099a01"
     },
     {
       "schema": 1,

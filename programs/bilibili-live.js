@@ -127,7 +127,7 @@ function* biliLiveAreas(state) {
       Date.now() - (state.liveAreasAt || 0) < 21600000)
     return state.liveAreas;
   var data = yield* biliLiveRequest("api.live.bilibili.com",
-    "/xlive/web-interface/v1/index/getWebAreaList", {}, state);
+    "/room/v1/Area/getList", {need_entrance: 1, parent_id: 0}, state);
   var rows = biliLiveAreaRows(data);
   if (!rows.length) throw new Error("哔哩哔哩直播分类结构暂不可用");
   state.liveAreas = rows;
