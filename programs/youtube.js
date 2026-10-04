@@ -197,6 +197,42 @@ function ytCollectCategoryTokens(root, state) {
   });
 }
 
+var YT_FALLBACK_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36";
+
+function* ytHttp(address, options) {
+  options = options || {};
+  var response = yield {
+    type: "http",
+    url: address,
+    method: options.method || "GET",
+    headers: options.headers || {},
+    body: options.body,
+    credential: !!options.credential,
+    sign: !!options.sign
+  };
+  var status = Number(response && response.status) || 0;
+  if (status !== 200) {
+    throw new Error("YouTube 请求失败（HTTP " + status + "）");
+  }
+  return String(response.text || "");
+}
+
+function* ytJson(address, options) {
+  var body = yield* ytHttp(address, options);
+  var response;
+  try {
+    response = JSON.parse(body);
+  } catch (_) {
+    throw new Error("YouTube 信息流响应不是有效 JSON");
+  }
+  if (response && response.error) {
+    var status = Number(response.error.code) || 0;
+    throw new Error("YouTube 信息流接口拒绝请求" +
+      (status ? "（HTTP " + status + "）" : ""));
+  }
+  return response;
+}
+
 function* ytBootstrap(state, force) {
   var now = Date.now();
   if (!force && state.bootstrapAt &&
@@ -205,12 +241,17 @@ function* ytBootstrap(state, force) {
     return state;
   }
 
-  var html = yield* http("https://www.youtube.com/", {
+  var html = yield* ytHttp("https://www.youtube.com/", {
     headers: {
-      "Accept": "text/html,application/xhtml+xml"
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+      "User-Agent": YT_FALLBACK_USER_AGENT
     },
     credential: true
   });
+  if (/consent\.youtube\.com|Before you continue to YouTube/i.test(html)) {
+    throw new Error("YouTube 要求重新确认网页登录授权，请更新 Cookie 后重试");
+  }
   var context = assignment(html, /INNERTUBE_CONTEXT"?\s*[:=]\s*/);
   var initial = assignment(html, /ytInitialData\s*=\s*/);
   if (!context || !context.client || !context.client.clientName ||
@@ -235,7 +276,7 @@ function* ytBootstrap(state, force) {
 }
 
 function* ytBrowse(state, continuation) {
-  return yield* json("https://www.youtube.com/youtubei/v1/browse?prettyPrint=false", {
+  return yield* ytJson("https://www.youtube.com/youtubei/v1/browse?prettyPrint=false", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -335,12 +376,14 @@ function* ytResolve(input) {
   if (!/^[A-Za-z0-9_-]{11}$/.test(videoId)) {
     throw new Error("YouTube 视频标识无效");
   }
-  var html = yield* http(
+  var html = yield* ytHttp(
     "https://www.youtube.com/watch?v=" + encodeURIComponent(videoId),
     {
       headers: {
         "Accept": "text/html,application/xhtml+xml",
-        "Referer": "https://www.youtube.com/"
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+        "Referer": "https://www.youtube.com/",
+        "User-Agent": YT_FALLBACK_USER_AGENT
       },
       credential: true
     }
