@@ -4,6 +4,13 @@ var BILI_LIVE_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
 var BILI_LIVE_WBI = [46,47,18,2,53,8,23,32,15,50,10,31,58,3,45,35,27,43,5,49,33,9,42,19,29,28,14,39,12,38,41,13,37,48,7,16,24,55,40,61,26,17,0,1,60,51,30,4,22,25,54,21,56,59,6,63,57,62,11,36,20,34,44,52];
 var BILI_LIVE_MEDIA_HOST = /(?:\.bilivideo\.(?:com|cn)|\.biliapi\.net|\.hdslb\.com|\.edge\.mountaintoys\.cn)$/i;
 
+function biliLiveClean(value) {
+  return String(value || "").replace(/<[^>]*>/g, " ")
+    .replace(/&amp;/g, "&").replace(/&quot;/g, "\"")
+    .replace(/&#39;/g, "'").replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">").replace(/\s+/g, " ").trim();
+}
+
 function biliLiveSecure(value) {
   value = String(value || "");
   if (value.indexOf("//") === 0) return "https:" + value;
@@ -15,15 +22,15 @@ function biliLiveId(row) {
 function biliLiveDrama(row, category) {
   var roomId = biliLiveId(row);
   if (!/^\d{1,16}$/.test(roomId) || Number(roomId) <= 0) return null;
-  var parent = clean((row || {}).area_v2_parent_name || (row || {}).parent_area_name || "");
-  var area = clean((row || {}).area_v2_name || (row || {}).area_name || "");
+  var parent = biliLiveClean((row || {}).area_v2_parent_name || (row || {}).parent_area_name || "");
+  var area = biliLiveClean((row || {}).area_v2_name || (row || {}).area_name || "");
   var areaName = parent && area && parent !== area ? parent + " / " + area : area || parent || category || "直播";
   var uid = String((row || {}).uid || (row || {}).mid || "");
   return {
     id: "bilibili-live:" + roomId,
     source: "bilibili-live",
     sourceId: roomId,
-    title: clean((row || {}).title || "") || "哔哩哔哩直播",
+    title: biliLiveClean((row || {}).title || "") || "哔哩哔哩直播",
     description: areaName,
     cover: biliLiveSecure((row || {}).cover || (row || {}).user_cover || ""),
     episodes: 1,
@@ -33,7 +40,7 @@ function biliLiveDrama(row, category) {
     heat: String((row || {}).online || ""),
     views: String((row || {}).online || ""),
     creatorId: /^\d{1,16}$/.test(uid) ? uid : "",
-    creatorName: clean((row || {}).uname || (row || {}).username || ""),
+    creatorName: biliLiveClean((row || {}).uname || (row || {}).username || ""),
     creatorAvatar: biliLiveSecure((row || {}).face || (row || {}).cover_from_user || "")
   };
 }
@@ -118,7 +125,7 @@ function biliLiveAreaRows(data) {
     (root.parent_list || root.parentList || root.data || root.area_list || []);
   return array(candidates).map(function(row) {
     var id = String((row || {}).id || (row || {}).parent_area_id || "");
-    var name = clean((row || {}).name || (row || {}).parent_area_name || "");
+    var name = biliLiveClean((row || {}).name || (row || {}).parent_area_name || "");
     return /^\d{1,8}$/.test(id) && name ? {id: id, name: name} : null;
   }).filter(Boolean);
 }

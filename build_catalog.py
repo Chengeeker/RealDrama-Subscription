@@ -35,16 +35,16 @@ SOURCES = [
            credentialGroup="bilibili", credentialDomains=["api.bilibili.com"]),
     source("bilibili-live", "Bilibili 直播", ["bilibili-live"],
            ["api.bilibili.com", "api.live.bilibili.com", "live.bilibili.com"],
-           BASIC + ["live"], kind="live", version="0.1.1", license="MIT",
+           BASIC + ["live"], kind="live", version="0.1.2", license="MIT",
            credentialGroup="bilibili", credentialRequired=False,
            credentialDomains=["api.live.bilibili.com"],
            description="公开直播推荐、关注和分区；关注列表可选 Cookie 登录"),
     source("tiktok", "TikTok", ["tiktok"], ["www.tiktok.com"],
-           BASIC, kind="video", version="0.1.0", credentialGroup="tiktok",
+           BASIC, kind="video", version="0.1.2", credentialGroup="tiktok",
            credentialRequired=True, credentialDomains=["www.tiktok.com"],
            description="Cookie 登录；推荐和关注短视频信息流"),
     source("youtube", "YouTube", ["youtube"], ["www.youtube.com"],
-           BASIC + ["live"], kind="video", version="0.1.1", credentialGroup="youtube",
+           BASIC + ["live"], kind="video", version="0.1.2", credentialGroup="youtube",
            credentialRequired=True, credentialDomains=["www.youtube.com"],
            description="登录态首页、游戏、直播、音乐和播客信息流；视频与直播播放解析"),
     source("hanxiaoquan", "韩小圈", ["web-cms"], ["www.jennyhow.com"], BASIC + ["search", "download"],
@@ -97,7 +97,7 @@ def main():
     ]
     for identifier, name, members in groups:
         base = dict(packages[members[0]])
-        bundle_version = {"douyin": "0.2.1", "bilibili": "0.3.1"}.get(identifier, "0.2.0")
+        bundle_version = {"douyin": "0.2.1", "bilibili": "0.3.2"}.get(identifier, "0.2.0")
         base.update(id=identifier, name=name, api=2, version=bundle_version,
                     description="组合订阅，子项独立开关；需要支持组合订阅的客户端",
                     domains=sorted({host for key in members for host in packages[key]["domains"]}),

@@ -179,7 +179,7 @@
       "api": 2,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.3.1",
+      "version": "0.3.2",
       "credentialDomains": [
         "api.bilibili.com"
       ],
@@ -256,14 +256,14 @@
         }
       ],
       "url": "sources/bilibili.json",
-      "sha256": "4d109243f17694468b11216e57267b401b636ee89ca4a0d2ef666e1a14099a01"
+      "sha256": "1a48cad5efbfed8558a3c6b0e30f7d08e62b1f1e7aaf79ef9e9ad9016ce7bd98"
     },
     {
       "schema": 1,
       "api": 1,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.1.0",
+      "version": "0.1.2",
       "credentialDomains": [
         "www.tiktok.com"
       ],
@@ -283,14 +283,14 @@
       "credentialGroup": "tiktok",
       "credentialRequired": true,
       "url": "sources/tiktok.json",
-      "sha256": "121c4c6cb2765f253d65cfed3183f7dd9cba82711758276340a33d14190958f0"
+      "sha256": "e79007ed047b27c7c4b44238f2a04203988435f9d393231b86b6b4836b5f0cef"
     },
     {
       "schema": 1,
       "api": 1,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "credentialDomains": [
         "www.youtube.com"
       ],
@@ -311,7 +311,7 @@
       "credentialGroup": "youtube",
       "credentialRequired": true,
       "url": "sources/youtube.json",
-      "sha256": "a9ad49f4bc795f6cc95276062e710fcf0592e7ba43691133d1d7a3ed464a7499"
+      "sha256": "ed3cefc9988b376901de302cb6d463f25e8d875285c5865019d6f34c59e9d478"
     },
     {
       "schema": 1,

@@ -33,19 +33,44 @@ function ytCategoryName(id) {
   return row ? row.name : "";
 }
 
-function ytFindRichGrid(root) {
-  if (!root || typeof root !== "object") return null;
-  if (root.richGridRenderer && Array.isArray(root.richGridRenderer.contents)) {
-    return root.richGridRenderer;
+function ytIndexHome(root, state) {
+  var pending = [root];
+  var inspected = 0;
+  var grid = null;
+  while (pending.length && inspected < 250000) {
+    var value = pending.pop();
+    if (!value || typeof value !== "object") continue;
+    inspected++;
+    if (grid && value === grid) {
+      var gridKeys = Object.keys(value);
+      for (var gridIndex = gridKeys.length - 1; gridIndex >= 0; gridIndex--) {
+        if (gridKeys[gridIndex] === "contents") continue;
+        var gridChild = value[gridKeys[gridIndex]];
+        if (gridChild && typeof gridChild === "object") pending.push(gridChild);
+      }
+      continue;
+    }
+    if (!grid && value.richGridRenderer &&
+        Array.isArray(value.richGridRenderer.contents)) {
+      grid = value.richGridRenderer;
+    }
+    if (value.chipCloudChipRenderer) {
+      var chip = value.chipCloudChipRenderer;
+      var category = ytCategory(ytText(chip.text));
+      var command = chip.navigationEndpoint &&
+        chip.navigationEndpoint.continuationCommand;
+      if (category && command && typeof command.token === "string") {
+        state.categoryTokens[category.id] = command.token;
+      }
+    }
+    var keys = Object.keys(value);
+    for (var i = keys.length - 1; i >= 0; i--) {
+      var child = value[keys[i]];
+      if (child && typeof child === "object") pending.push(child);
+    }
   }
-  var values = Array.isArray(root) ? root : Object.keys(root).map(function (key) {
-    return root[key];
-  });
-  for (var i = 0; i < values.length; i++) {
-    var found = ytFindRichGrid(values[i]);
-    if (found) return found;
-  }
-  return null;
+  if (pending.length) throw new Error("YouTube 首页结构超出解析范围");
+  return grid;
 }
 
 function ytFeedItems(response) {
@@ -178,25 +203,6 @@ function ytRows(items, category, state) {
   });
 }
 
-function ytCollectCategoryTokens(root, state) {
-  if (!root || typeof root !== "object") return;
-  if (root.chipCloudChipRenderer) {
-    var chip = root.chipCloudChipRenderer;
-    var category = ytCategory(ytText(chip.text));
-    var command = chip.navigationEndpoint &&
-      chip.navigationEndpoint.continuationCommand;
-    if (category && command && typeof command.token === "string") {
-      state.categoryTokens[category.id] = command.token;
-    }
-  }
-  var values = Array.isArray(root) ? root : Object.keys(root).map(function (key) {
-    return root[key];
-  });
-  values.forEach(function (value) {
-    ytCollectCategoryTokens(value, state);
-  });
-}
-
 var YT_FALLBACK_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36";
 
 function* ytHttp(address, options) {
@@ -212,7 +218,10 @@ function* ytHttp(address, options) {
   };
   var status = Number(response && response.status) || 0;
   if (status !== 200) {
-    throw new Error("YouTube 请求失败（HTTP " + status + "）");
+    var error = new Error("YouTube 请求失败");
+    error.sourceError = "http";
+    error.httpStatus = status;
+    throw error;
   }
   return String(response.text || "");
 }
@@ -259,11 +268,10 @@ function* ytBootstrap(state, force) {
     throw new Error("YouTube 首页未提供可用的信息流上下文");
   }
 
-  var grid = ytFindRichGrid(initial);
+  state.categoryTokens = {};
+  var grid = ytIndexHome(initial, state);
   if (!grid) throw new Error("YouTube 首页信息流格式已变化");
   state.context = context;
-  state.categoryTokens = {};
-  ytCollectCategoryTokens(initial, state);
   state.rootItems = ytRows(grid.contents, "", state);
   state.rootCursor = ytNextFromItems(grid.contents);
   state.bootstrapAt = now;
