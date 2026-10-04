@@ -176,34 +176,87 @@
     },
     {
       "schema": 1,
-      "api": 1,
+      "api": 2,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.2.1",
+      "version": "0.3.0",
       "credentialDomains": [
         "api.bilibili.com"
       ],
-      "description": "可独立更新的本地站源程序",
+      "description": "组合订阅，子项独立开关；需要支持组合订阅的客户端",
       "id": "bilibili",
-      "name": "哔哩哔哩",
+      "name": "Bilibili",
       "domains": [
-        "api.bilibili.com"
+        "api.bilibili.com",
+        "api.live.bilibili.com",
+        "live.bilibili.com"
       ],
       "capabilities": [
+        "account",
         "catalog",
         "categories",
-        "detail",
-        "resolve",
-        "creator",
         "comments",
-        "account",
-        "search",
-        "danmaku"
+        "creator",
+        "danmaku",
+        "detail",
+        "live",
+        "resolve",
+        "search"
       ],
       "kind": "video",
       "credentialGroup": "bilibili",
+      "children": [
+        {
+          "credentialDomains": [
+            "api.bilibili.com"
+          ],
+          "description": "可独立更新的本地站源程序",
+          "id": "bilibili",
+          "name": "Bilibili 视频",
+          "domains": [
+            "api.bilibili.com"
+          ],
+          "capabilities": [
+            "catalog",
+            "categories",
+            "detail",
+            "resolve",
+            "creator",
+            "comments",
+            "account",
+            "search",
+            "danmaku"
+          ],
+          "kind": "video",
+          "credentialGroup": "bilibili"
+        },
+        {
+          "credentialDomains": [
+            "api.live.bilibili.com"
+          ],
+          "description": "公开直播推荐、关注和分区；关注列表可选 Cookie 登录",
+          "id": "bilibili-live",
+          "name": "Bilibili 直播",
+          "domains": [
+            "api.bilibili.com",
+            "api.live.bilibili.com",
+            "live.bilibili.com"
+          ],
+          "capabilities": [
+            "catalog",
+            "categories",
+            "detail",
+            "resolve",
+            "live"
+          ],
+          "kind": "live",
+          "license": "MIT",
+          "credentialGroup": "bilibili",
+          "credentialRequired": false
+        }
+      ],
       "url": "sources/bilibili.json",
-      "sha256": "ee7c244f8c6f816d9271fbe5800c30506ebb48e430e6442193c86a07e9b26ba7"
+      "sha256": "d25e9d5957dd17a0de79cb748431892771b9d03a9f7186d4681cc0b9c0f82977"
     },
     {
       "schema": 1,
@@ -212,29 +265,25 @@
       "engine": "javascript-generator-v1",
       "version": "0.1.0",
       "credentialDomains": [
-        "api.live.bilibili.com"
+        "www.tiktok.com"
       ],
-      "description": "公开直播推荐、关注和分区；关注列表可选 Cookie 登录",
-      "id": "bilibili-live",
-      "name": "哔哩哔哩直播",
+      "description": "Cookie 登录；推荐和关注短视频信息流",
+      "id": "tiktok",
+      "name": "TikTok",
       "domains": [
-        "api.bilibili.com",
-        "api.live.bilibili.com",
-        "live.bilibili.com"
+        "www.tiktok.com"
       ],
       "capabilities": [
         "catalog",
         "categories",
         "detail",
-        "resolve",
-        "live"
+        "resolve"
       ],
-      "kind": "live",
-      "license": "MIT",
-      "credentialGroup": "bilibili",
-      "credentialRequired": false,
-      "url": "sources/bilibili-live.json",
-      "sha256": "6b1038c5b2f9f4396fe285989130a1d256aec22226ebc40db1af343098828a8f"
+      "kind": "video",
+      "credentialGroup": "tiktok",
+      "credentialRequired": true,
+      "url": "sources/tiktok.json",
+      "sha256": "121c4c6cb2765f253d65cfed3183f7dd9cba82711758276340a33d14190958f0"
     },
     {
       "schema": 1,

@@ -30,10 +30,10 @@ SOURCES = [
     source("douyin-theater", "抖音放映厅", ["douyin"], DOUYIN_DOMAINS,
            BASIC + ["creator", "comments"], family="douyin", kind="video", version="0.1.1",
            credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DOMAINS),
-    source("bilibili", "哔哩哔哩", ["bilibili"], ["api.bilibili.com"],
+    source("bilibili", "Bilibili 视频", ["bilibili"], ["api.bilibili.com"],
            BASIC + ["creator", "comments", "account", "search", "danmaku"], kind="video", version="0.2.1",
            credentialGroup="bilibili", credentialDomains=["api.bilibili.com"]),
-    source("bilibili-live", "哔哩哔哩直播", ["bilibili-live"],
+    source("bilibili-live", "Bilibili 直播", ["bilibili-live"],
            ["api.bilibili.com", "api.live.bilibili.com", "live.bilibili.com"],
            BASIC + ["live"], kind="live", version="0.1.0", license="MIT",
            credentialGroup="bilibili", credentialRequired=False,
@@ -88,11 +88,13 @@ def main():
         entries.append(dict(metadata, url="sources/"+record["id"]+".json", sha256=hashlib.sha256(content).hexdigest()))
     groups = [
         ("douyin", "抖音", ["douyin", "douyin-live", "douyin-series", "douyin-theater"]),
+        ("bilibili", "Bilibili", ["bilibili", "bilibili-live"]),
         ("huangguo", "黄果", ["huangguoai", "huangguo-video", "cloudfront"]),
     ]
     for identifier, name, members in groups:
         base = dict(packages[members[0]])
-        base.update(id=identifier, name=name, api=2, version="0.2.1" if identifier == "douyin" else "0.2.0",
+        bundle_version = {"douyin": "0.2.1", "bilibili": "0.3.0"}.get(identifier, "0.2.0")
+        base.update(id=identifier, name=name, api=2, version=bundle_version,
                     description="组合订阅，子项独立开关；需要支持组合订阅的客户端",
                     domains=sorted({host for key in members for host in packages[key]["domains"]}),
                     capabilities=sorted({cap for key in members for cap in packages[key]["capabilities"]}))
