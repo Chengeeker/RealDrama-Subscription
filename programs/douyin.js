@@ -39,6 +39,16 @@ function* sourceExecute(action,input,state){var source=input.source,drama=input.
   }
   feed.seen=feed.seen.slice(-240);state.feeds[category]=feed;if(!items.length&&page===1&&category!=='follow')throw new Error('当前分栏暂无可播放内容');return {items:items,count:items.length,hasMore:more,fresh:true,warning:items.length?'':category==='follow'?'当前账号关注内容暂无可播放视频或直播':''};
  }
+ if(action==='danmaku'){
+  if(source!=='douyin')throw new Error('该子源尚无已验证的点播弹幕接口');
+  var start=Math.floor(Math.max(0,Number(input.positionMs)||0)/32000)*32000,end=start+32000;
+  if(!/^\d+$/.test(id))throw new Error('视频弹幕标识无效');
+  var response=yield* dyRequest('/aweme/v1/web/danmaku/get_v2/',{item_id:id,group_id:id,start_time:String(start),end_time:String(end)},{host:'www-hj.douyin.com',referer:'https://www.douyin.com/video/'+id});
+  if(response.danmaku_list!==null&&response.danmaku_list!==undefined&&!Array.isArray(response.danmaku_list))throw new Error('弹幕数据格式已变化');
+  var seen={},items=array(response.danmaku_list).map(function(row){return {id:String(row.danmaku_id||''),positionMs:Number(row.offset_time),text:String(row.text||'').slice(0,120),mode:1,color:16777215};}).filter(function(row){var key=row.id||row.positionMs+':'+row.text;if(seen[key]||!isFinite(row.positionMs)||row.positionMs<start||row.positionMs>=end||!row.text)return false;seen[key]=true;return true;}).sort(function(a,b){return a.positionMs-b.positionMs;});
+  if(items.length>500){var step=items.length/500;items=Array.from({length:500},function(_,index){return items[Math.floor(index*step)];});}
+  return {items:items,startMs:start,endMs:end,total:Number(response.total)||0};
+ }
  if(action==='comments'){var response=yield* dyRequest('/aweme/v1/web/comment/list/',{aweme_id:id,cursor:input.cursor||'0',count:'20',item_type:'0'},{referer:'https://www.douyin.com/video/'+id});if(!Array.isArray(response.comments))throw new Error('评论列表未返回');return {items:response.comments.slice(0,20).map(function(row){var user=row.user||{};return {id:String(row.cid||''),author:String(user.nickname||'抖音用户'),avatar:url(user.avatar_thumb||user.avatar_medium),text:String(row.text||''),likes:Number(row.digg_count)||0};}),cursor:String(response.cursor||'0'),hasMore:yes(response.has_more)&&String(response.cursor)!==String(input.cursor||'0'),total:Number(response.total)||0};}
  if(action==='creator'){
   if(['douyin','douyin-theater'].indexOf(input.videoSource)<0)throw new Error('请先导入并开启抖音短视频或放映厅，以播放作者作品');

@@ -38,16 +38,18 @@
       "api": 2,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "credentialDomains": [
         "www.douyin.com",
-        "live.douyin.com"
+        "live.douyin.com",
+        "www-hj.douyin.com"
       ],
       "description": "组合订阅，子项独立开关；需要支持组合订阅的客户端",
       "id": "douyin",
       "name": "抖音",
       "domains": [
         "live.douyin.com",
+        "www-hj.douyin.com",
         "www.douyin.com"
       ],
       "capabilities": [
@@ -55,6 +57,7 @@
         "categories",
         "comments",
         "creator",
+        "danmaku",
         "detail",
         "live",
         "resolve"
@@ -67,14 +70,16 @@
         {
           "credentialDomains": [
             "www.douyin.com",
-            "live.douyin.com"
+            "live.douyin.com",
+            "www-hj.douyin.com"
           ],
           "description": "可独立更新的本地站源程序",
           "id": "douyin",
           "name": "抖音短视频",
           "domains": [
             "www.douyin.com",
-            "live.douyin.com"
+            "live.douyin.com",
+            "www-hj.douyin.com"
           ],
           "capabilities": [
             "catalog",
@@ -82,7 +87,8 @@
             "detail",
             "resolve",
             "creator",
-            "comments"
+            "comments",
+            "danmaku"
           ],
           "family": "douyin",
           "kind": "video",
@@ -166,14 +172,14 @@
         }
       ],
       "url": "sources/douyin.json",
-      "sha256": "66f23ed6cd7cacf0ce8fc6b92ec26698dc800f07c2a007e3567fec8e8491f2e6"
+      "sha256": "6cb5a0cf8930d410e05c8930a1794dcf4679e9cf7859bb46fdadeaabdeb69157"
     },
     {
       "schema": 1,
       "api": 1,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "credentialDomains": [
         "api.bilibili.com"
       ],
@@ -191,12 +197,13 @@
         "creator",
         "comments",
         "account",
-        "search"
+        "search",
+        "danmaku"
       ],
       "kind": "video",
       "credentialGroup": "bilibili",
       "url": "sources/bilibili.json",
-      "sha256": "d2c282c128acfc7924d0a85450288e15d96b38c3fd58c1aa70c87d60e1055f84"
+      "sha256": "73d6294a4566a1302e63a116bddb55b50c6b50e69a150cae4b8218050065f2af"
     },
     {
       "schema": 1,

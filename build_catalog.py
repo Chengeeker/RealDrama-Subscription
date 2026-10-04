@@ -12,25 +12,26 @@ def source(identifier, name, programs, domains, capabilities=None, **extra):
 
 BASIC = ["catalog", "categories", "detail", "resolve"]
 DOUYIN_DOMAINS = ["www.douyin.com", "live.douyin.com"]
+DOUYIN_DANMAKU_DOMAINS = DOUYIN_DOMAINS + ["www-hj.douyin.com"]
 SOURCES = [
     source("hongguo", "红果", ["hongguo", "hongguo-web"],
            ["api5-normal-sinfonlineb.fqnovel.com", "hongguoduanju.com", "djapi.999888456.xyz"],
            BASIC + ["search", "suggestions", "rankings", "download", "catalogTools"],
            description="真人剧、漫剧、AI 剧；App、网页及备用公开播放接口"),
-    source("douyin", "抖音短视频", ["douyin"], DOUYIN_DOMAINS,
-           BASIC + ["creator", "comments"], family="douyin", kind="video",
-           credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DOMAINS),
+    source("douyin", "抖音短视频", ["douyin"], DOUYIN_DANMAKU_DOMAINS,
+           BASIC + ["creator", "comments", "danmaku"], family="douyin", kind="video", version="0.1.1",
+           credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DANMAKU_DOMAINS),
     source("douyin-live", "抖音直播", ["douyin"], DOUYIN_DOMAINS,
-           BASIC + ["creator", "live"], family="douyin", kind="live",
+           BASIC + ["creator", "live"], family="douyin", kind="live", version="0.1.1",
            credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DOMAINS),
     source("douyin-series", "抖音短剧", ["douyin"], DOUYIN_DOMAINS,
-           BASIC + ["creator", "comments"], family="douyin", kind="drama",
+           BASIC + ["creator", "comments"], family="douyin", kind="drama", version="0.1.1",
            credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DOMAINS),
     source("douyin-theater", "抖音放映厅", ["douyin"], DOUYIN_DOMAINS,
-           BASIC + ["creator", "comments"], family="douyin", kind="video",
+           BASIC + ["creator", "comments"], family="douyin", kind="video", version="0.1.1",
            credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DOMAINS),
     source("bilibili", "哔哩哔哩", ["bilibili"], ["api.bilibili.com"],
-           BASIC + ["creator", "comments", "account", "search"], kind="video",
+           BASIC + ["creator", "comments", "account", "search", "danmaku"], kind="video", version="0.2.0",
            credentialGroup="bilibili", credentialDomains=["api.bilibili.com"]),
     source("hanxiaoquan", "韩小圈", ["web-cms"], ["www.jennyhow.com"], BASIC + ["search", "download"],
            config=dict(id="hanxiaoquan", base="https://www.jennyhow.com", categories=[
@@ -81,7 +82,7 @@ def main():
     ]
     for identifier, name, members in groups:
         base = dict(packages[members[0]])
-        base.update(id=identifier, name=name, api=2, version="0.2.0",
+        base.update(id=identifier, name=name, api=2, version="0.2.1" if identifier == "douyin" else "0.2.0",
                     description="组合订阅，子项独立开关；需要支持组合订阅的客户端",
                     domains=sorted({host for key in members for host in packages[key]["domains"]}),
                     capabilities=sorted({cap for key in members for cap in packages[key]["capabilities"]}))
