@@ -43,6 +43,10 @@ SOURCES = [
            BASIC, kind="video", version="0.1.0", credentialGroup="tiktok",
            credentialRequired=True, credentialDomains=["www.tiktok.com"],
            description="Cookie 登录；推荐和关注短视频信息流"),
+    source("youtube", "YouTube", ["youtube"], ["www.youtube.com"],
+           BASIC + ["live"], kind="video", version="0.1.0", credentialGroup="youtube",
+           credentialRequired=True, credentialDomains=["www.youtube.com"],
+           description="登录态首页、游戏、直播、音乐和播客信息流；视频与直播播放解析"),
     source("hanxiaoquan", "韩小圈", ["web-cms"], ["www.jennyhow.com"], BASIC + ["search", "download"],
            config=dict(id="hanxiaoquan", base="https://www.jennyhow.com", categories=[
                dict(id=str(n), name=name) for n, name in [(1,"韩剧"),(2,"电影"),(3,"综艺"),(4,"动漫")]])),

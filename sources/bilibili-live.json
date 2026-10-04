@@ -9,7 +9,7 @@
   ],
   "description": "公开直播推荐、关注和分区；关注列表可选 Cookie 登录",
   "id": "bilibili-live",
-  "name": "哔哩哔哩直播",
+  "name": "Bilibili 直播",
   "domains": [
     "api.bilibili.com",
     "api.live.bilibili.com",

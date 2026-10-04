@@ -291,6 +291,34 @@
       "status": "draft",
       "engine": "javascript-generator-v1",
       "version": "0.1.0",
+      "credentialDomains": [
+        "www.youtube.com"
+      ],
+      "description": "登录态首页、游戏、直播、音乐和播客信息流；视频与直播播放解析",
+      "id": "youtube",
+      "name": "YouTube",
+      "domains": [
+        "www.youtube.com"
+      ],
+      "capabilities": [
+        "catalog",
+        "categories",
+        "detail",
+        "resolve",
+        "live"
+      ],
+      "kind": "video",
+      "credentialGroup": "youtube",
+      "credentialRequired": true,
+      "url": "sources/youtube.json",
+      "sha256": "b5b1354a90e0eed440e43c4c5f960d66e1797e063ac3194d7f3563a43c819d62"
+    },
+    {
+      "schema": 1,
+      "api": 1,
+      "status": "draft",
+      "engine": "javascript-generator-v1",
+      "version": "0.1.0",
       "credentialDomains": [],
       "description": "可独立更新的本地站源程序",
       "id": "hanxiaoquan",
