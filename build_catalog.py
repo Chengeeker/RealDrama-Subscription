@@ -56,6 +56,7 @@ def main():
     PACKAGES.mkdir(exist_ok=True)
     sdk = (PROGRAMS / "sdk.js").read_text(encoding="utf-8")
     entries = []
+    packages = {}
     for definition in SOURCES:
         record = dict(definition)
         names = record.pop("programs")
@@ -71,11 +72,39 @@ def main():
         package["program"] = program
         content = (json.dumps(package, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
         (PACKAGES / (record["id"] + ".json")).write_bytes(content)
+        packages[record["id"]] = package
         metadata = {k:v for k,v in package.items() if k != "program"}
         entries.append(dict(metadata, url="sources/"+record["id"]+".json", sha256=hashlib.sha256(content).hexdigest()))
+    groups = [
+        ("douyin", "抖音", ["douyin", "douyin-live", "douyin-series", "douyin-theater"]),
+        ("huangguo", "黄果", ["huangguoai", "huangguo-video", "cloudfront"]),
+    ]
+    for identifier, name, members in groups:
+        base = dict(packages[members[0]])
+        base.update(id=identifier, name=name, api=2, version="0.2.0",
+                    description="组合订阅，子项独立开关；需要支持组合订阅的客户端",
+                    domains=sorted({host for key in members for host in packages[key]["domains"]}),
+                    capabilities=sorted({cap for key in members for cap in packages[key]["capabilities"]}))
+        children = []
+        for key in members:
+            child = dict(packages[key])
+            for field in ["schema", "api", "engine", "status", "version"]:
+                child.pop(field, None)
+            if child["program"] == base["program"]:
+                child.pop("program")
+            children.append(child)
+        base["children"] = children
+        content = (json.dumps(base, ensure_ascii=False, indent=2)+"\n").encode("utf-8")
+        (PACKAGES / (identifier+".json")).write_bytes(content)
+        metadata = {k:v for k,v in base.items() if k != "program"}
+        metadata["children"] = [{k:v for k,v in child.items() if k != "program"} for child in children]
+        grouped = dict(metadata, url="sources/"+identifier+".json", sha256=hashlib.sha256(content).hexdigest())
+        position = next(i for i, entry in enumerate(entries) if entry["id"] in members)
+        entries = [entry for entry in entries if entry["id"] not in members]
+        entries.insert(position, grouped)
     catalog = dict(schema=1, name="RealDrama 站源迁移开发快照", api=1, status="draft", sources=entries)
     (ROOT / "subscription.json").write_bytes((json.dumps(catalog, ensure_ascii=False, indent=2)+"\n").encode("utf-8"))
-    print("Generated", len(entries), "source packages")
+    print("Generated", len(entries), "subscriptions")
 
 if __name__ == "__main__":
     main()

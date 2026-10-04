@@ -35,131 +35,138 @@
     },
     {
       "schema": 1,
-      "api": 1,
+      "api": 2,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "credentialDomains": [
         "www.douyin.com",
         "live.douyin.com"
       ],
-      "description": "可独立更新的本地站源程序",
+      "description": "组合订阅，子项独立开关；需要支持组合订阅的客户端",
       "id": "douyin",
-      "name": "抖音短视频",
+      "name": "抖音",
       "domains": [
-        "www.douyin.com",
-        "live.douyin.com"
+        "live.douyin.com",
+        "www.douyin.com"
       ],
       "capabilities": [
         "catalog",
         "categories",
-        "detail",
-        "resolve",
+        "comments",
         "creator",
-        "comments"
+        "detail",
+        "live",
+        "resolve"
       ],
       "family": "douyin",
       "kind": "video",
       "credentialGroup": "douyin",
       "credentialRequired": true,
+      "children": [
+        {
+          "credentialDomains": [
+            "www.douyin.com",
+            "live.douyin.com"
+          ],
+          "description": "可独立更新的本地站源程序",
+          "id": "douyin",
+          "name": "抖音短视频",
+          "domains": [
+            "www.douyin.com",
+            "live.douyin.com"
+          ],
+          "capabilities": [
+            "catalog",
+            "categories",
+            "detail",
+            "resolve",
+            "creator",
+            "comments"
+          ],
+          "family": "douyin",
+          "kind": "video",
+          "credentialGroup": "douyin",
+          "credentialRequired": true
+        },
+        {
+          "credentialDomains": [
+            "www.douyin.com",
+            "live.douyin.com"
+          ],
+          "description": "可独立更新的本地站源程序",
+          "id": "douyin-live",
+          "name": "抖音直播",
+          "domains": [
+            "www.douyin.com",
+            "live.douyin.com"
+          ],
+          "capabilities": [
+            "catalog",
+            "categories",
+            "detail",
+            "resolve",
+            "creator",
+            "live"
+          ],
+          "family": "douyin",
+          "kind": "live",
+          "credentialGroup": "douyin",
+          "credentialRequired": true
+        },
+        {
+          "credentialDomains": [
+            "www.douyin.com",
+            "live.douyin.com"
+          ],
+          "description": "可独立更新的本地站源程序",
+          "id": "douyin-series",
+          "name": "抖音短剧",
+          "domains": [
+            "www.douyin.com",
+            "live.douyin.com"
+          ],
+          "capabilities": [
+            "catalog",
+            "categories",
+            "detail",
+            "resolve",
+            "creator",
+            "comments"
+          ],
+          "family": "douyin",
+          "kind": "drama",
+          "credentialGroup": "douyin",
+          "credentialRequired": true
+        },
+        {
+          "credentialDomains": [
+            "www.douyin.com",
+            "live.douyin.com"
+          ],
+          "description": "可独立更新的本地站源程序",
+          "id": "douyin-theater",
+          "name": "抖音放映厅",
+          "domains": [
+            "www.douyin.com",
+            "live.douyin.com"
+          ],
+          "capabilities": [
+            "catalog",
+            "categories",
+            "detail",
+            "resolve",
+            "creator",
+            "comments"
+          ],
+          "family": "douyin",
+          "kind": "video",
+          "credentialGroup": "douyin",
+          "credentialRequired": true
+        }
+      ],
       "url": "sources/douyin.json",
-      "sha256": "278a2251a7e7cdd5f823e9d37e7a5bf2e42ec7458f9e9fdfe0ffacb8da874e94"
-    },
-    {
-      "schema": 1,
-      "api": 1,
-      "status": "draft",
-      "engine": "javascript-generator-v1",
-      "version": "0.1.0",
-      "credentialDomains": [
-        "www.douyin.com",
-        "live.douyin.com"
-      ],
-      "description": "可独立更新的本地站源程序",
-      "id": "douyin-live",
-      "name": "抖音直播",
-      "domains": [
-        "www.douyin.com",
-        "live.douyin.com"
-      ],
-      "capabilities": [
-        "catalog",
-        "categories",
-        "detail",
-        "resolve",
-        "creator",
-        "live"
-      ],
-      "family": "douyin",
-      "kind": "live",
-      "credentialGroup": "douyin",
-      "credentialRequired": true,
-      "url": "sources/douyin-live.json",
-      "sha256": "7d478b5a0cfcd91b383330c7293efa3f9cf917fbf4ea4eefed04079b42e33c65"
-    },
-    {
-      "schema": 1,
-      "api": 1,
-      "status": "draft",
-      "engine": "javascript-generator-v1",
-      "version": "0.1.0",
-      "credentialDomains": [
-        "www.douyin.com",
-        "live.douyin.com"
-      ],
-      "description": "可独立更新的本地站源程序",
-      "id": "douyin-series",
-      "name": "抖音短剧",
-      "domains": [
-        "www.douyin.com",
-        "live.douyin.com"
-      ],
-      "capabilities": [
-        "catalog",
-        "categories",
-        "detail",
-        "resolve",
-        "creator",
-        "comments"
-      ],
-      "family": "douyin",
-      "kind": "drama",
-      "credentialGroup": "douyin",
-      "credentialRequired": true,
-      "url": "sources/douyin-series.json",
-      "sha256": "290e81ccc0bb54ff757812e4c2764e1f4bc0feb4c9c14905b06ef5975ba610b2"
-    },
-    {
-      "schema": 1,
-      "api": 1,
-      "status": "draft",
-      "engine": "javascript-generator-v1",
-      "version": "0.1.0",
-      "credentialDomains": [
-        "www.douyin.com",
-        "live.douyin.com"
-      ],
-      "description": "可独立更新的本地站源程序",
-      "id": "douyin-theater",
-      "name": "抖音放映厅",
-      "domains": [
-        "www.douyin.com",
-        "live.douyin.com"
-      ],
-      "capabilities": [
-        "catalog",
-        "categories",
-        "detail",
-        "resolve",
-        "creator",
-        "comments"
-      ],
-      "family": "douyin",
-      "kind": "video",
-      "credentialGroup": "douyin",
-      "credentialRequired": true,
-      "url": "sources/douyin-theater.json",
-      "sha256": "e70d8d70d45ead44bdf481472c50425f8f70b95355acaf352186c56afde7ea5c"
+      "sha256": "66f23ed6cd7cacf0ce8fc6b92ec26698dc800f07c2a007e3567fec8e8491f2e6"
     },
     {
       "schema": 1,
@@ -368,80 +375,91 @@
     },
     {
       "schema": 1,
-      "api": 1,
+      "api": 2,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "credentialDomains": [],
-      "description": "可独立更新的本地站源程序",
-      "id": "huangguoai",
-      "name": "黄果 AI",
+      "description": "组合订阅，子项独立开关；需要支持组合订阅的客户端",
+      "id": "huangguo",
+      "name": "黄果",
       "domains": [
-        "huangguoai.com"
-      ],
-      "capabilities": [
-        "catalog",
-        "categories",
-        "detail",
-        "resolve",
-        "download"
-      ],
-      "family": "huangguo",
-      "url": "sources/huangguoai.json",
-      "sha256": "50e1402acff789fd37bc9bab466dd2f84eb541b05b0015addd5eea785c7b02ea"
-    },
-    {
-      "schema": 1,
-      "api": 1,
-      "status": "draft",
-      "engine": "javascript-generator-v1",
-      "version": "0.1.0",
-      "credentialDomains": [],
-      "description": "可独立更新的本地站源程序",
-      "id": "huangguo-video",
-      "name": "黄果视频",
-      "domains": [
-        "huangguo.video"
-      ],
-      "capabilities": [
-        "catalog",
-        "categories",
-        "detail",
-        "resolve",
-        "download"
-      ],
-      "family": "huangguo",
-      "browser": true,
-      "url": "sources/huangguo-video.json",
-      "sha256": "8dc48ea83011f2278485ea6338a4a2225deae911f80fde395177d5899ccdb801"
-    },
-    {
-      "schema": 1,
-      "api": 1,
-      "status": "draft",
-      "engine": "javascript-generator-v1",
-      "version": "0.1.0",
-      "credentialDomains": [],
-      "description": "可独立更新的本地站源程序",
-      "id": "cloudfront",
-      "name": "黄果旧版",
-      "domains": [
-        "d2pypzndaqisk.cloudfront.net",
-        "dr6skssi3nxbk.cloudfront.net",
         "d18ka9rqpfd3lo.cloudfront.net",
+        "d2pypzndaqisk.cloudfront.net",
         "d37n0wjehmw08f.cloudfront.net",
+        "dr6skssi3nxbk.cloudfront.net",
+        "huangguo.video",
+        "huangguoai.com",
         "sjljsla.lkkwip.cn"
       ],
       "capabilities": [
         "catalog",
         "categories",
         "detail",
-        "resolve",
-        "download"
+        "download",
+        "resolve"
       ],
       "family": "huangguo",
-      "url": "sources/cloudfront.json",
-      "sha256": "db7f2671ec50ac6231a795125a2d786e81cb1c4f3ca7de52c90898bc7488a050"
+      "children": [
+        {
+          "credentialDomains": [],
+          "description": "可独立更新的本地站源程序",
+          "id": "huangguoai",
+          "name": "黄果 AI",
+          "domains": [
+            "huangguoai.com"
+          ],
+          "capabilities": [
+            "catalog",
+            "categories",
+            "detail",
+            "resolve",
+            "download"
+          ],
+          "family": "huangguo"
+        },
+        {
+          "credentialDomains": [],
+          "description": "可独立更新的本地站源程序",
+          "id": "huangguo-video",
+          "name": "黄果视频",
+          "domains": [
+            "huangguo.video"
+          ],
+          "capabilities": [
+            "catalog",
+            "categories",
+            "detail",
+            "resolve",
+            "download"
+          ],
+          "family": "huangguo",
+          "browser": true
+        },
+        {
+          "credentialDomains": [],
+          "description": "可独立更新的本地站源程序",
+          "id": "cloudfront",
+          "name": "黄果旧版",
+          "domains": [
+            "d2pypzndaqisk.cloudfront.net",
+            "dr6skssi3nxbk.cloudfront.net",
+            "d18ka9rqpfd3lo.cloudfront.net",
+            "d37n0wjehmw08f.cloudfront.net",
+            "sjljsla.lkkwip.cn"
+          ],
+          "capabilities": [
+            "catalog",
+            "categories",
+            "detail",
+            "resolve",
+            "download"
+          ],
+          "family": "huangguo"
+        }
+      ],
+      "url": "sources/huangguo.json",
+      "sha256": "d21efd01d03bc4381a50ddb4347f240d42d03897426c916e4f9f18dd5112d867"
     }
   ]
 }
