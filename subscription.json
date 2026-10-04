@@ -340,11 +340,11 @@
       "api": 1,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "credentialDomains": [],
       "description": "可独立更新的本地站源程序",
       "id": "stripchat",
-      "name": "StripChat",
+      "name": "Stripchat 成人直播",
       "domains": [
         "zh.stripchat.global",
         "zh.stripol.com",
@@ -364,7 +364,7 @@
       ],
       "kind": "live",
       "url": "sources/stripchat.json",
-      "sha256": "75bec93929799319fbc701351a470f6532182779879af4ee6ce374185b1739c1"
+      "sha256": "0c72a4812e95f8bb2abff369c9f8f256679b993829e3b222338d8a0355fa3c35"
     },
     {
       "schema": 1,
