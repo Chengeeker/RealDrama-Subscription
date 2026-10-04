@@ -211,6 +211,64 @@
       "status": "draft",
       "engine": "javascript-generator-v1",
       "version": "0.1.0",
+      "credentialDomains": [
+        "api.live.bilibili.com"
+      ],
+      "description": "公开直播推荐、关注和分区；关注列表可选 Cookie 登录",
+      "id": "bilibili-live",
+      "name": "哔哩哔哩直播",
+      "domains": [
+        "api.bilibili.com",
+        "api.live.bilibili.com",
+        "live.bilibili.com"
+      ],
+      "capabilities": [
+        "catalog",
+        "categories",
+        "detail",
+        "resolve",
+        "live"
+      ],
+      "kind": "live",
+      "license": "MIT",
+      "credentialGroup": "bilibili",
+      "credentialRequired": false,
+      "url": "sources/bilibili-live.json",
+      "sha256": "6b1038c5b2f9f4396fe285989130a1d256aec22226ebc40db1af343098828a8f"
+    },
+    {
+      "schema": 1,
+      "api": 1,
+      "status": "draft",
+      "engine": "javascript-generator-v1",
+      "version": "0.1.0",
+      "credentialDomains": [
+        "www.tiktok.com"
+      ],
+      "description": "Cookie 登录；推荐和关注短视频信息流",
+      "id": "tiktok",
+      "name": "TikTok",
+      "domains": [
+        "www.tiktok.com"
+      ],
+      "capabilities": [
+        "catalog",
+        "categories",
+        "detail",
+        "resolve"
+      ],
+      "kind": "video",
+      "credentialGroup": "tiktok",
+      "credentialRequired": true,
+      "url": "sources/tiktok.json",
+      "sha256": "121c4c6cb2765f253d65cfed3183f7dd9cba82711758276340a33d14190958f0"
+    },
+    {
+      "schema": 1,
+      "api": 1,
+      "status": "draft",
+      "engine": "javascript-generator-v1",
+      "version": "0.1.0",
       "credentialDomains": [],
       "description": "可独立更新的本地站源程序",
       "id": "hanxiaoquan",

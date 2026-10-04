@@ -2,12 +2,16 @@
 
 独立维护 RealDrama 的站源程序、分类、目录和媒体解析逻辑。
 
-> 当前为迁移草稿：11 个订阅包含 16 个子源，尚未完成运行验证。请勿将此状态当作可用发行版。
+> 当前为迁移草稿：13 个订阅包含 18 个子源，尚未完成运行验证。请勿将此状态当作可用发行版。
 
 ## 导入地址
 
 - 仓库目录：`https://raw.githubusercontent.com/Chengeeker/RealDrama-Subscription/main/subscription.json`
 - 单独站源：`https://raw.githubusercontent.com/Chengeeker/RealDrama-Subscription/main/sources/<站源ID>.json`
+
+TikTok 单源包提供推荐和关注信息流，按客户端用户隔离保存 Cookie。当前脚本为开发快照，未完成客户端实播验收。
+
+哔哩哔哩直播单源包提供推荐、关注和直播分区信息流。该程序独立编写并标记为 MIT；SimpleLive 与 PiliPlus 仅用于核对行为和字段，未复制 GPL 源码。
 
 此目录提供开发快照，导入不代表通过验收。客户端可以预览目录、选择导入站源、检查程序版本和回退上一版。程序更新与同步站源视频目录是两个操作。
 
