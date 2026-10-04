@@ -291,33 +291,6 @@
       "status": "draft",
       "engine": "javascript-generator-v1",
       "version": "0.1.0",
-      "credentialDomains": [
-        "www.tiktok.com"
-      ],
-      "description": "Cookie 登录；推荐和关注短视频信息流",
-      "id": "tiktok",
-      "name": "TikTok",
-      "domains": [
-        "www.tiktok.com"
-      ],
-      "capabilities": [
-        "catalog",
-        "categories",
-        "detail",
-        "resolve"
-      ],
-      "kind": "video",
-      "credentialGroup": "tiktok",
-      "credentialRequired": true,
-      "url": "sources/tiktok.json",
-      "sha256": "121c4c6cb2765f253d65cfed3183f7dd9cba82711758276340a33d14190958f0"
-    },
-    {
-      "schema": 1,
-      "api": 1,
-      "status": "draft",
-      "engine": "javascript-generator-v1",
-      "version": "0.1.0",
       "credentialDomains": [],
       "description": "可独立更新的本地站源程序",
       "id": "hanxiaoquan",
