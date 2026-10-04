@@ -55,3 +55,9 @@
 - `danmaku` 输入为 `{drama,chapter,positionMs}`，输出 `{items,startMs,endMs}`；每项为 `{id,positionMs,text,mode,color}`。读取请求可声明 `binary:true`，客户端返回 Base64 原字节；旧客户端缺少此能力时明确报错。
 - 需要包含本轮接入的 RealDrama 0.12.0 客户端，先升级应用再更新相关订阅。旧客户端不支持新增官方凭据域名或二进制读取；更新失败保留旧包。当前 APK 0.11.1 不含弹幕接入。
 - 默认关闭、开启才取流；最大单段 1 MiB，B 站最多 1800 条/段，抖音最多 500 条/窗，超出均匀采样。仅读取及展示，尚未完成构建、账号接口和设备播放验收。直播聊天帧未解码，不作为可用弹幕源。
+
+## 哔哩哔哩播放修复（0.2.1 开发快照）
+
+读取 DASH 音视频轨道的 baseUrl/base_url、backupUrl/backup_url，优先常规 bilivideo.com CDN，再选其他已识别 CDN。每轨最多三个地址，返回最多三组包含音频的 DASH 备用线路，避免只返回无声视频。保持当前 CID、WBI、弹幕和凭据协议，不增加解析请求数。Edge 实际观察到 `.edge.mountaintoys.cn` 媒体返回 HTTP 206，匿名 playurl 样本返回 code=0。
+
+RealDrama 0.12.4+150 核心补齐该 CDN 后缀，并保留视频地址相同而音频不同的备用清单。旧核心可使用本包优先选取的常规 CDN，但新 CDN 与完整备用线路行为需升级应用。站源包及目录已同步到订阅仓库；配套应用原生核心修复尚未编译新 APK。未完成集中测试或设备实播验收。

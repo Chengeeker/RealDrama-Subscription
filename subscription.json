@@ -179,7 +179,7 @@
       "api": 1,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "credentialDomains": [
         "api.bilibili.com"
       ],
@@ -203,7 +203,7 @@
       "kind": "video",
       "credentialGroup": "bilibili",
       "url": "sources/bilibili.json",
-      "sha256": "73d6294a4566a1302e63a116bddb55b50c6b50e69a150cae4b8218050065f2af"
+      "sha256": "ee7c244f8c6f816d9271fbe5800c30506ebb48e430e6442193c86a07e9b26ba7"
     },
     {
       "schema": 1,

@@ -31,7 +31,7 @@ SOURCES = [
            BASIC + ["creator", "comments"], family="douyin", kind="video", version="0.1.1",
            credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DOMAINS),
     source("bilibili", "哔哩哔哩", ["bilibili"], ["api.bilibili.com"],
-           BASIC + ["creator", "comments", "account", "search", "danmaku"], kind="video", version="0.2.0",
+           BASIC + ["creator", "comments", "account", "search", "danmaku"], kind="video", version="0.2.1",
            credentialGroup="bilibili", credentialDomains=["api.bilibili.com"]),
     source("hanxiaoquan", "韩小圈", ["web-cms"], ["www.jennyhow.com"], BASIC + ["search", "download"],
            config=dict(id="hanxiaoquan", base="https://www.jennyhow.com", categories=[
