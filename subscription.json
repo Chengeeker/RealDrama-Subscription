@@ -263,7 +263,7 @@
       "api": 1,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.1.5",
+      "version": "0.1.6",
       "credentialDomains": [
         "www.tiktok.com"
       ],
@@ -283,7 +283,7 @@
       "credentialGroup": "tiktok",
       "credentialRequired": true,
       "url": "sources/tiktok.json",
-      "sha256": "a0b74c4662ff4e7dd2251e3f6f3c08d656320ce034b688dd2d5ad279cea85548"
+      "sha256": "609662faba18fecab898c591dac28a91f48a6c3c9e8dadac5f72794257d71552"
     },
     {
       "schema": 1,

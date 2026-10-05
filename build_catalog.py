@@ -40,7 +40,7 @@ SOURCES = [
            credentialDomains=["api.live.bilibili.com"],
            description="公开直播推荐、关注和分区；关注列表可选 Cookie 登录"),
     source("tiktok", "TikTok", ["tiktok"], ["www.tiktok.com"],
-           BASIC, kind="video", version="0.1.5", credentialGroup="tiktok",
+           BASIC, kind="video", version="0.1.6", credentialGroup="tiktok",
            credentialRequired=True, credentialDomains=["www.tiktok.com"],
            description="Cookie 登录；推荐和关注短视频信息流"),
     source("youtube", "YouTube", ["youtube"], ["www.youtube.com"],
