@@ -83,7 +83,7 @@ function ytFeedItems(response) {
     var command = action.appendContinuationItemsAction ||
       action.reloadContinuationItemsCommand;
     array(command && command.continuationItems).forEach(function (row) {
-      if (row && (row.richItemRenderer || row.videoRenderer)) result.push(row.richItemRenderer || row);
+      if (row && (row.richItemRenderer || row.videoRenderer || row.lockupViewModel || row.itemSectionRenderer || row.richSectionRenderer)) result.push(row);
     });
   });
   return result;
@@ -114,9 +114,9 @@ function ytNextFromResponse(response) {
 
 function ytCard(item, category, state) {
   var renderer = item && item.richItemRenderer || item;
-  var lock = renderer && renderer.content && renderer.content.lockupViewModel;
+  var lock = renderer && (renderer.lockupViewModel || renderer.content && renderer.content.lockupViewModel);
   if (!lock) {
-    var legacy = renderer && (renderer.videoRenderer || renderer.content && renderer.content.videoRenderer);
+    var legacy = renderer && (renderer.videoRenderer || renderer.gridVideoRenderer || renderer.compactVideoRenderer || renderer.content && renderer.content.videoRenderer);
     if (!legacy || !/^[A-Za-z0-9_-]{11}$/.test(String(legacy.videoId || ""))) return null;
     var authors = legacy.ownerText || legacy.shortBylineText || legacy.longBylineText || {};
     var authorRun = array(authors.runs)[0] || {};
@@ -207,9 +207,22 @@ function ytCard(item, category, state) {
   return drama;
 }
 
+function ytFlattenItems(root) {
+  var pending=[root], items=[], scanned=0;
+  while(pending.length && scanned++<30000 && items.length<120) {
+    var value=pending.pop();if(!value||typeof value!=="object")continue;
+    if(value.richItemRenderer||value.videoRenderer||value.gridVideoRenderer||value.compactVideoRenderer||value.lockupViewModel) {items.push(value);continue;}
+    var keys=Object.keys(value);for(var i=keys.length-1;i>=0;i--) {
+      var key=keys[i];if(key==="navigationEndpoint"||key==="thumbnail"||key==="trackingParams"||key==="metadata")continue;
+      if(value[key]&&typeof value[key]==="object")pending.push(value[key]);
+    }
+  }
+  return items;
+}
+
 function ytRows(items, category, state) {
   var seen = {};
-  return array(items).map(function (item) {
+  return ytFlattenItems(items).map(function (item) {
     return ytCard(item, category, state);
   }).filter(function (row) {
     if (!row || seen[row.sourceId]) return false;
@@ -285,20 +298,25 @@ function* ytBootstrap(state, force) {
 
   state.categoryTokens = {};
   var grid = ytIndexHome(initial, state);
-  if (!grid) throw ytFailure("youtube_feed");
   state.context = context;
-  state.rootItems = ytRows(grid.contents, "", state);
-  state.rootCursor = ytNextFromItems(grid.contents);
+  state.rootItems = ytRows(grid ? grid.contents : initial, "", state);
+  state.rootCursor = ytNextFromItems(grid && grid.contents);
+  if(!state.rootItems.length) {
+    var response=yield* ytBrowse(state, "", "FEwhat_to_watch");
+    var fallbackGrid=ytIndexHome(response,state);
+    state.rootItems=ytRows(fallbackGrid ? fallbackGrid.contents : response,"",state);
+    state.rootCursor=ytNextFromItems(fallbackGrid&&fallbackGrid.contents)||ytNextFromResponse(response);
+  }
   state.bootstrapAt = now;
   state.cursors = {};
   state.cursorPages = {};
   if (!state.rootItems.length) {
-    throw ytFailure("youtube_feed");
+    throw ytFailure("youtube_feed_empty");
   }
   return state;
 }
 
-function* ytBrowse(state, continuation) {
+function* ytBrowse(state, continuation, browseId) {
   return yield* ytJson("https://www.youtube.com/youtubei/v1/browse?prettyPrint=false", {
     method: "POST",
     headers: {
@@ -312,7 +330,8 @@ function* ytBrowse(state, continuation) {
     },
     body: {
       context: state.context,
-      continuation: continuation
+      continuation: continuation || undefined,
+      browseId: browseId || undefined
     },
     credential: true,
     sign: true
