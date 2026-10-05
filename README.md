@@ -2,14 +2,14 @@
 
 独立维护 RealDrama 的站源程序、分类、目录和媒体解析逻辑。
 
-> 当前为迁移草稿：11 个订阅包含 17 个子源，尚未完成运行验证。请勿将此状态当作可用发行版。
+> 当前为迁移草稿：12 个订阅包含 17 个子源，尚未完成运行验证。请勿将此状态当作可用发行版。
 
 ## 导入地址
 
 - 仓库目录：`https://raw.githubusercontent.com/Chengeeker/RealDrama-Subscription/main/subscription.json`
 - 单独站源：`https://raw.githubusercontent.com/Chengeeker/RealDrama-Subscription/main/sources/<站源ID>.json`
 
-TikTok 与 YouTube 订阅源已下架，不再提供导入或更新。此前已导入的用户需要在应用站源订阅页面手动移除；目录下架不会自动删除设备上的本地订阅。
+TikTok 订阅源仍已下架。YouTube 单源包 0.1.8 已恢复，提供登录态首页及游戏、直播、音乐和播客信息流；视频播放由客户端应用内的 YouTube 官方嵌入播放器处理。该恢复包和实机播放仍待验收。
 
 
 哔哩哔哩直播单源包 0.1.2 提供推荐、关注和直播分区信息流。独立包此前引用了 UGC 程序才定义的 `clean` 函数，导致分类转换直接异常；现已增加直播源自己的字段清理函数。该程序独立编写并标记为 MIT；SimpleLive 与 PiliPlus 仅用于核对行为和字段，未复制 GPL 源码。合成数据已通过分类、推荐目录和直播解析链路，仍需上游账号与设备验收。
