@@ -441,7 +441,7 @@ function* ytResolve(input) {
       source: "youtube",
       quality: 0,
       qualities: [],
-      headers: { "Referer": "https://www.youtube.com/" }
+      headers: { "Referer": "https://www.youtube.com/", "User-Agent": YT_FALLBACK_USER_AGENT }
     };
   }
 
@@ -451,7 +451,8 @@ function* ytResolve(input) {
       url: String(row && row.url || ""),
       height: Number(row && row.height) ||
         Number(String(row && row.qualityLabel || "").replace(/[^\d]/g, "")) || 0,
-      mime: mime
+      mime: mime,
+      headers: { "Referer": "https://www.youtube.com/", "User-Agent": YT_FALLBACK_USER_AGENT }
     };
   }).filter(function (row) {
     return /^https:\/\//.test(row.url) && row.mime.indexOf("video/") === 0;
@@ -459,7 +460,7 @@ function* ytResolve(input) {
   if (formats.length) {
     var selected = select(formats, Number(input.quality) || 0);
     selected.source = "youtube";
-    selected.headers = { "Referer": "https://www.youtube.com/" };
+    selected.headers = { "Referer": "https://www.youtube.com/", "User-Agent": YT_FALLBACK_USER_AGENT };
     return selected;
   }
 

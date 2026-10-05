@@ -290,7 +290,7 @@
       "api": 1,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.1.4",
+      "version": "0.1.5",
       "credentialDomains": [
         "www.youtube.com"
       ],
@@ -311,7 +311,7 @@
       "credentialGroup": "youtube",
       "credentialRequired": true,
       "url": "sources/youtube.json",
-      "sha256": "370be39bdbffee9d29556aa6c1b5ac32a68ae38747eeede01b3b73eb5bf2a124"
+      "sha256": "28c7329a8ec1ecfe5fc8a024d524e847f04245827a7e95f6b07a483752e583f9"
     },
     {
       "schema": 1,
