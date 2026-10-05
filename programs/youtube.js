@@ -412,12 +412,77 @@ function* ytCatalog(input, state) {
   return ytResult(response, category, state, page);
 }
 
+var YT_ANDROID_USER_AGENT = "com.google.android.youtube/20.02.35 (Linux; U; Android 14) gzip";
+
+function ytMediaPlan(player, input, userAgent) {
+  var streams = player.streamingData || {};
+  var hls = String(streams.hlsManifestUrl || "");
+  if (hls.indexOf("https://") === 0) {
+    return {
+      url: hls,
+      source: "youtube",
+      quality: 0,
+      qualities: [],
+      headers: { "Referer": "https://www.youtube.com/", "User-Agent": userAgent }
+    };
+  }
+
+  var formats = array(streams.formats).map(function (row) {
+    var mime = String(row && row.mimeType || "");
+    return {
+      url: String(row && row.url || ""),
+      height: Number(row && row.height) ||
+        Number(String(row && row.qualityLabel || "").replace(/[^\d]/g, "")) || 0,
+      mime: mime,
+      headers: { "Referer": "https://www.youtube.com/", "User-Agent": userAgent }
+    };
+  }).filter(function (row) {
+    return /^https:\/\//.test(row.url) && row.mime.indexOf("video/") === 0;
+  });
+  if (formats.length) {
+    var selected = select(formats, Number(input.quality) || 0);
+    selected.source = "youtube";
+    selected.headers = { "Referer": "https://www.youtube.com/", "User-Agent": userAgent };
+    return selected;
+  }
+
+  return null;
+}
+
 function* ytResolve(input) {
   var drama = input.drama || {};
   var videoId = String(drama.sourceId || "");
   if (!/^[A-Za-z0-9_-]{11}$/.test(videoId)) {
     throw new Error("YouTube 视频标识无效");
   }
+  try {
+    var mobilePlayer = yield* ytJson("https://www.youtube.com/youtubei/v1/player?prettyPrint=false", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "User-Agent": YT_ANDROID_USER_AGENT
+      },
+      body: JSON.stringify({
+        context: {
+          client: {
+            clientName: "ANDROID",
+            clientVersion: "20.02.35",
+            osName: "Android",
+            osVersion: "14",
+            hl: "zh-CN",
+            gl: "US"
+          }
+        },
+        videoId: videoId,
+        contentCheckOk: true,
+        racyCheckOk: true
+      })
+    });
+    if (mobilePlayer.playabilityStatus && mobilePlayer.playabilityStatus.status === "OK") {
+      var mobilePlan = ytMediaPlan(mobilePlayer, input, YT_ANDROID_USER_AGENT);
+      if (mobilePlan) return mobilePlan;
+    }
+  } catch (_) {}
   var html = yield* ytHttp(
     "https://www.youtube.com/watch?v=" + encodeURIComponent(videoId),
     {
@@ -432,44 +497,8 @@ function* ytResolve(input) {
   );
   var player = ytAssignment(html, /ytInitialPlayerResponse(?:["\']\])?\s*=\s*/);
   if (!player) throw ytFailure("youtube_player");
-  var details = player.videoDetails || {};
-  var streams = player.streamingData || {};
-  var hls = String(streams.hlsManifestUrl || "");
-  if (hls.indexOf("https://") === 0) {
-    return {
-      url: hls,
-      source: "youtube",
-      quality: 0,
-      qualities: [],
-      headers: { "Referer": "https://www.youtube.com/", "User-Agent": YT_FALLBACK_USER_AGENT }
-    };
-  }
-
-  var formats = array(streams.formats).map(function (row) {
-    var mime = String(row && row.mimeType || "");
-    return {
-      url: String(row && row.url || ""),
-      height: Number(row && row.height) ||
-        Number(String(row && row.qualityLabel || "").replace(/[^\d]/g, "")) || 0,
-      mime: mime,
-      headers: { "Referer": "https://www.youtube.com/", "User-Agent": YT_FALLBACK_USER_AGENT }
-    };
-  }).filter(function (row) {
-    return /^https:\/\//.test(row.url) && row.mime.indexOf("video/") === 0;
-  });
-  if (formats.length) {
-    var selected = select(formats, Number(input.quality) || 0);
-    selected.source = "youtube";
-    selected.headers = { "Referer": "https://www.youtube.com/", "User-Agent": YT_FALLBACK_USER_AGENT };
-    return selected;
-  }
-
-  if (details.isLive === true || details.isLiveContent === true) {
-    throw ytFailure("youtube_player");
-  }
-  if (streams.serverAbrStreamingUrl) {
-    throw ytFailure("youtube_player");
-  }
+  var plan = ytMediaPlan(player, input, YT_FALLBACK_USER_AGENT);
+  if (plan) return plan;
   throw ytFailure("youtube_player");
 }
 

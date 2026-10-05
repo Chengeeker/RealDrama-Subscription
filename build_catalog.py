@@ -44,7 +44,7 @@ SOURCES = [
            credentialRequired=True, credentialDomains=["www.tiktok.com"],
            description="Cookie 登录；推荐和关注短视频信息流"),
     source("youtube", "YouTube", ["youtube"], ["www.youtube.com"],
-           BASIC + ["live"], kind="video", version="0.1.5", credentialGroup="youtube",
+           BASIC + ["live"], kind="video", version="0.1.6", credentialGroup="youtube",
            credentialRequired=True, credentialDomains=["www.youtube.com"],
            description="登录态首页、游戏、直播、音乐和播客信息流；视频与直播播放解析"),
     source("hanxiaoquan", "韩小圈", ["web-cms"], ["www.jennyhow.com"], BASIC + ["search", "download"],
