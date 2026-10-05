@@ -108,3 +108,7 @@ YouTube 0.1.3 兼容 videoRenderer 与 lockupViewModel 卡片、带引号的页�
 解析优先调用匿名 Android InnerTube Player API，未返回可直接播放的 HLS / 合轨格式时，有限回退至原有带本机 Cookie 的观看页。媒体主计划及备用变体沿用对应解析客户端 UA，不将账号凭据传给 CDN；不将分离的 adaptiveFormats 当作合轨媒体播放。正常解析一次请求，回退最多两次；没有新增库或放宽原生 Cookie 白名单。
 
 两个公开普通视频的 Android itag 18 小范围媒体请求返回 HTTP 206；iOS 样本没有 HLS，直播样本返回 UNPLAYABLE。此结果仅代表本次网络探测，不能保证所有视频、地区、登录内容或设备播放，仍保持 draft。修改仅需更新 YouTube 订阅包，不需要新版 APK；本次提交后可在应用站源管理中更新并测试。实机播放仍待验证。
+
+## YouTube 0.1.7 登录态播放回退开发快照
+
+普通解析保留已验证的匿名 Android 合轨流；失败或播放器强制刷新时，使用 Safari UA 读取本机登录态观看页，并以页面动态上下文/STS 发出只读 Player 请求。优先 HLS，账号凭据仅发至 www.youtube.com。完整支持此回退需要客户端 0.16.11；每次最多三次读取，HTTP 429 不继续切换请求。机器人验证与登录限制分别显示，不将 HTTP 200 视为可播放；声明媒体有效期。登录态 HLS 与手机应用实播尚待验收，不能保证 Cookie 自动解除所有验证。

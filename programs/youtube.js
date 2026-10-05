@@ -449,57 +449,102 @@ function ytMediaPlan(player, input, userAgent) {
   return null;
 }
 
-function* ytResolve(input) {
-  var drama = input.drama || {};
-  var videoId = String(drama.sourceId || "");
-  if (!/^[A-Za-z0-9_-]{11}$/.test(videoId)) {
-    throw new Error("YouTube 视频标识无效");
+var YT_SAFARI_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.5 Safari/605.1.15,gzip(gfe)";
+
+function ytPlayerFailure(player) {
+  var status = player && player.playabilityStatus || {};
+  var reason = String(status.reason || "").toLowerCase();
+  if (/bot|机器人/.test(reason)) return "youtube_bot";
+  if (status.status === "LOGIN_REQUIRED") return "youtube_login";
+  return "youtube_player";
+}
+
+function ytExpiringPlan(player, input, userAgent) {
+  if (!player || player.playabilityStatus && player.playabilityStatus.status !== "OK") return null;
+  var plan = ytMediaPlan(player, input, userAgent);
+  if (!plan) return null;
+  var ttl = Number(player.streamingData && player.streamingData.expiresInSeconds);
+  if (isFinite(ttl) && ttl > 0) {
+    plan.expiresAt = Date.now() + Math.min(ttl, 21600) * 1000;
+    array(plan.variants).forEach(function (variant) { variant.expiresAt = plan.expiresAt; });
   }
-  try {
-    var mobilePlayer = yield* ytJson("https://www.youtube.com/youtubei/v1/player?prettyPrint=false", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": YT_ANDROID_USER_AGENT
-      },
-      body: JSON.stringify({
-        context: {
-          client: {
-            clientName: "ANDROID",
-            clientVersion: "20.02.35",
-            osName: "Android",
-            osVersion: "14",
-            hl: "zh-CN",
-            gl: "US"
-          }
-        },
-        videoId: videoId,
-        contentCheckOk: true,
-        racyCheckOk: true
-      })
-    });
-    if (mobilePlayer.playabilityStatus && mobilePlayer.playabilityStatus.status === "OK") {
-      var mobilePlan = ytMediaPlan(mobilePlayer, input, YT_ANDROID_USER_AGENT);
-      if (mobilePlan) return mobilePlan;
-    }
-  } catch (_) {}
-  var html = yield* ytHttp(
-    "https://www.youtube.com/watch?v=" + encodeURIComponent(videoId),
-    {
-      headers: {
-        "Accept": "text/html,application/xhtml+xml",
-        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-        "Referer": "https://www.youtube.com/",
-        "User-Agent": YT_FALLBACK_USER_AGENT
-      },
-      credential: true
-    }
-  );
+  return plan;
+}
+
+function* ytAndroidPlayer(videoId) {
+  return yield* ytJson("https://www.youtube.com/youtubei/v1/player?prettyPrint=false", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "User-Agent": YT_ANDROID_USER_AGENT },
+    body: JSON.stringify({
+      context: { client: {
+        clientName: "ANDROID", clientVersion: "20.02.35",
+        osName: "Android", osVersion: "14", hl: "zh-CN", gl: "US"
+      } },
+      videoId: videoId, contentCheckOk: true, racyCheckOk: true
+    })
+  });
+}
+
+function* ytSafariPlayer(videoId, input) {
+  var html = yield* ytHttp("https://www.youtube.com/watch?v=" + encodeURIComponent(videoId), {
+    headers: {
+      "Accept": "text/html,application/xhtml+xml",
+      "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+      "Referer": "https://www.youtube.com/", "User-Agent": YT_SAFARI_USER_AGENT
+    },
+    credential: true
+  });
   var player = ytAssignment(html, /ytInitialPlayerResponse(?:["\']\])?\s*=\s*/);
-  if (!player) throw ytFailure("youtube_player");
-  var plan = ytMediaPlan(player, input, YT_FALLBACK_USER_AGENT);
-  if (plan) return plan;
-  throw ytFailure("youtube_player");
+  var plan = ytExpiringPlan(player, input, YT_SAFARI_USER_AGENT);
+  if (plan) return { plan: plan };
+  var context = ytAssignment(html, /INNERTUBE_CONTEXT"?\s*[:=]\s*/);
+  var stamp = /"STS"\s*:\s*(\d+)/.exec(html);
+  if (!context || !context.client || !context.client.clientVersion || !stamp) {
+    return { code: ytPlayerFailure(player) };
+  }
+  context.client.clientName = "WEB";
+  context.client.userAgent = YT_SAFARI_USER_AGENT;
+  var headers = {
+    "Content-Type": "application/json", "User-Agent": YT_SAFARI_USER_AGENT,
+    "Referer": "https://www.youtube.com/", "X-Origin": "https://www.youtube.com",
+    "X-YouTube-Client-Name": "1", "X-YouTube-Client-Version": String(context.client.clientVersion)
+  };
+  if (context.client.visitorData) headers["X-Goog-Visitor-Id"] = String(context.client.visitorData);
+  player = yield* ytJson("https://www.youtube.com/youtubei/v1/player?prettyPrint=false", {
+    method: "POST", headers: headers, credential: true, sign: true,
+    body: JSON.stringify({
+      context: context, videoId: videoId, contentCheckOk: true, racyCheckOk: true,
+      playbackContext: { contentPlaybackContext: {
+        html5Preference: "HTML5_PREF_WANTS", signatureTimestamp: Number(stamp[1])
+      } }
+    })
+  });
+  return { plan: ytExpiringPlan(player, input, YT_SAFARI_USER_AGENT), code: ytPlayerFailure(player) };
+}
+
+function* ytResolve(input) {
+  var videoId = String((input.drama || {}).sourceId || "");
+  if (!/^[A-Za-z0-9_-]{11}$/.test(videoId)) throw new Error("YouTube 视频标识无效");
+  var code = "youtube_player";
+  var candidates = input.force === true ? ["safari", "android"] : ["android", "safari"];
+  for (var index = 0; index < candidates.length; index++) {
+    try {
+      if (candidates[index] === "android") {
+        var player = yield* ytAndroidPlayer(videoId);
+        var plan = ytExpiringPlan(player, input, YT_ANDROID_USER_AGENT);
+        if (plan) return plan;
+        var failure = ytPlayerFailure(player);
+        if (failure !== "youtube_player") code = failure;
+      } else {
+        var result = yield* ytSafariPlayer(videoId, input);
+        if (result.plan) return result.plan;
+        if (result.code && result.code !== "youtube_player") code = result.code;
+      }
+    } catch (error) {
+      if (error.httpStatus === 429) throw error;
+    }
+  }
+  throw ytFailure(code);
 }
 
 function* sourceExecute(action, input, state) {
