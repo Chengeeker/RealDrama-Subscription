@@ -1,5 +1,9 @@
 "use strict";
 
+function ytFailure(code){var error=new Error("YouTube request unavailable");error.sourceError=code;return error;}
+
+function ytAssignment(body,pattern){return typeof jsonAssignment==="function"?JSON.parse(jsonAssignment(body,pattern.source)):assignment(body,pattern);}
+
 var YT_CATEGORIES = [
   { id: "gaming", name: "游戏", labels: ["gaming", "游戏"] },
   { id: "live", name: "直播", labels: ["live", "直播"] },
@@ -75,11 +79,11 @@ function ytIndexHome(root, state) {
 
 function ytFeedItems(response) {
   var result = [];
-  array(response && response.onResponseReceivedActions).forEach(function (action) {
+  array(response && response.onResponseReceivedActions).concat(array(response && response.onResponseReceivedEndpoints)).forEach(function (action) {
     var command = action.appendContinuationItemsAction ||
       action.reloadContinuationItemsCommand;
     array(command && command.continuationItems).forEach(function (row) {
-      if (row && row.richItemRenderer) result.push(row.richItemRenderer);
+      if (row && (row.richItemRenderer || row.videoRenderer)) result.push(row.richItemRenderer || row);
     });
   });
   return result;
@@ -99,7 +103,7 @@ function ytNextFromItems(items) {
 
 function ytNextFromResponse(response) {
   var token = "";
-  array(response && response.onResponseReceivedActions).some(function (action) {
+  array(response && response.onResponseReceivedActions).concat(array(response && response.onResponseReceivedEndpoints)).some(function (action) {
     var command = action.appendContinuationItemsAction ||
       action.reloadContinuationItemsCommand;
     token = ytNextFromItems(command && command.continuationItems);
@@ -111,7 +115,18 @@ function ytNextFromResponse(response) {
 function ytCard(item, category, state) {
   var renderer = item && item.richItemRenderer || item;
   var lock = renderer && renderer.content && renderer.content.lockupViewModel;
-  if (!lock) return null;
+  if (!lock) {
+    var legacy = renderer && (renderer.videoRenderer || renderer.content && renderer.content.videoRenderer);
+    if (!legacy || !/^[A-Za-z0-9_-]{11}$/.test(String(legacy.videoId || ""))) return null;
+    var authors = legacy.ownerText || legacy.shortBylineText || legacy.longBylineText || {};
+    var authorRun = array(authors.runs)[0] || {};
+    var endpoint = authorRun.navigationEndpoint && authorRun.navigationEndpoint.browseEndpoint || {};
+    var row = {id:"youtube:"+legacy.videoId,source:"youtube",sourceId:legacy.videoId,title:ytText(legacy.title),description:"",cover:String((array(legacy.thumbnail && legacy.thumbnail.thumbnails)[0] || {}).url || ""),episodes:1,category:ytCategoryName(category)||"推荐",tags:["YouTube"],creatorName:ytText(authors),creatorId:String(endpoint.browseId || ""),creatorAvatar:""};
+    if (!row.title) return null;
+    state.rows=state.rows||{};state.rows[row.sourceId]=row;
+    var ids=Object.keys(state.rows);while(ids.length>80)delete state.rows[ids.shift()];
+    return row;
+  }
   var videoId = String(lock.contentId || "");
   if (!/^[A-Za-z0-9_-]{11}$/.test(videoId)) return null;
 
@@ -259,18 +274,18 @@ function* ytBootstrap(state, force) {
     credential: true
   });
   if (/consent\.youtube\.com|Before you continue to YouTube/i.test(html)) {
-    throw new Error("YouTube 要求重新确认网页登录授权，请更新 Cookie 后重试");
+    throw ytFailure("youtube_consent");
   }
-  var context = assignment(html, /INNERTUBE_CONTEXT"?\s*[:=]\s*/);
-  var initial = assignment(html, /ytInitialData\s*=\s*/);
+  var context = ytAssignment(html, /INNERTUBE_CONTEXT"?\s*[:=]\s*/);
+  var initial = ytAssignment(html, /ytInitialData(?:["\']\])?\s*=\s*/);
   if (!context || !context.client || !context.client.clientName ||
       !context.client.clientVersion || !initial) {
-    throw new Error("YouTube 首页未提供可用的信息流上下文");
+    throw ytFailure("youtube_context");
   }
 
   state.categoryTokens = {};
   var grid = ytIndexHome(initial, state);
-  if (!grid) throw new Error("YouTube 首页信息流格式已变化");
+  if (!grid) throw ytFailure("youtube_feed");
   state.context = context;
   state.rootItems = ytRows(grid.contents, "", state);
   state.rootCursor = ytNextFromItems(grid.contents);
@@ -278,7 +293,7 @@ function* ytBootstrap(state, force) {
   state.cursors = {};
   state.cursorPages = {};
   if (!state.rootItems.length) {
-    throw new Error("YouTube 首页没有返回登录态信息流，请检查账号 Cookie");
+    throw ytFailure("youtube_feed");
   }
   return state;
 }
@@ -332,7 +347,7 @@ function* ytCatalog(input, state) {
     throw new Error("YouTube 分类无效");
   }
   if (category && !state.categoryTokens[category]) {
-    throw new Error("YouTube 当前账号没有该分类入口，请刷新分类列表");
+    throw ytFailure("youtube_category");
   }
   var key = category || "all";
   if (page === 1 && !category) {
@@ -373,7 +388,7 @@ function* ytCatalog(input, state) {
   if (response.responseContext &&
       response.responseContext.mainAppWebResponseContext &&
       response.responseContext.mainAppWebResponseContext.loggedOut === true) {
-    throw new Error("YouTube 返回未登录信息流，请检查账号 Cookie");
+    throw ytFailure("youtube_context");
   }
   return ytResult(response, category, state, page);
 }
@@ -396,8 +411,8 @@ function* ytResolve(input) {
       credential: true
     }
   );
-  var player = assignment(html, /ytInitialPlayerResponse\s*=\s*/);
-  if (!player) throw new Error("YouTube 播放信息暂不可用");
+  var player = ytAssignment(html, /ytInitialPlayerResponse(?:["\']\])?\s*=\s*/);
+  if (!player) throw ytFailure("youtube_player");
   var details = player.videoDetails || {};
   var streams = player.streamingData || {};
   var hls = String(streams.hlsManifestUrl || "");
@@ -430,12 +445,12 @@ function* ytResolve(input) {
   }
 
   if (details.isLive === true || details.isLiveContent === true) {
-    throw new Error("YouTube 直播没有提供 HLS 播放地址");
+    throw ytFailure("youtube_player");
   }
   if (streams.serverAbrStreamingUrl) {
-    throw new Error("该 YouTube 视频只提供浏览器 UMP 流，当前播放器无法直接解析");
+    throw ytFailure("youtube_player");
   }
-  throw new Error("YouTube 没有提供可直接播放的视频地址");
+  throw ytFailure("youtube_player");
 }
 
 function* sourceExecute(action, input, state) {
