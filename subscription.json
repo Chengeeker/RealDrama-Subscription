@@ -263,34 +263,6 @@
       "api": 1,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.1.8",
-      "credentialDomains": [
-        "www.youtube.com"
-      ],
-      "description": "登录态首页与游戏、直播、音乐、播客信息流；客户端使用 YouTube 官方嵌入播放器",
-      "id": "youtube",
-      "name": "YouTube",
-      "domains": [
-        "www.youtube.com"
-      ],
-      "capabilities": [
-        "catalog",
-        "categories",
-        "detail",
-        "resolve",
-        "live"
-      ],
-      "kind": "video",
-      "credentialGroup": "youtube",
-      "credentialRequired": true,
-      "url": "sources/youtube.json",
-      "sha256": "877fd3c1fe372e49b8f8f221260efedce3690703c631185522b3193d5a0dfa4c"
-    },
-    {
-      "schema": 1,
-      "api": 1,
-      "status": "draft",
-      "engine": "javascript-generator-v1",
       "version": "0.1.7",
       "credentialDomains": [
         "www.tiktok.com"
