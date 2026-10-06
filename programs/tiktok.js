@@ -1,0 +1,87 @@
+var TT_ORIGIN='https://www.tiktok.com',TT_UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36',TT_ADDRESS_MAX_AGE_MS=120000;
+var TT_CATEGORIES=[['recommend','推荐'],['following','关注']];
+function ttArray(value){return Array.isArray(value)?value:[];}
+function ttText(value,limit){return String(value==null?'':value).slice(0,limit||4000);}
+function ttNumber(value){var number=Number(value);return isFinite(number)&&number>0?number:0;}
+function ttYes(value){return value===true||value===1||value==='1'||value==='true';}
+function ttUrlList(value){var rows=Array.isArray(value)?value:value&&Array.isArray(value.UrlList)?value.UrlList:value&&Array.isArray(value.url_list)?value.url_list:[];return rows.filter(function(address){return typeof address==='string'&&/^https:\/\//i.test(address);}).slice(0,2);}
+function ttUrl(value){if(typeof value==='string'&&/^https:\/\//i.test(value))return value;var rows=ttUrlList(value);return rows[0]||'';}
+function ttAuthor(author){author=author||{};return {uniqueId:ttText(author.uniqueId||author.unique_id,256),nickname:ttText(author.nickname,256),secUid:ttText(author.secUid||author.sec_uid,512),avatar:ttUrl(author.avatar||author.avatarThumb||author.avatarMedium||author.avatarLarger||author.avatar_thumb||author.avatar_medium)};}
+function ttDrama(row,category){var author=ttAuthor(row.author),stats=row.stats||{},video=row.video||{},id=String(row.id||'');return {id:'tiktok:'+id,source:'tiktok',sourceId:id,title:ttText(row.desc||author.nickname||'TikTok 视频',256),description:ttText(row.desc,4000),cover:ttUrl(video.cover||video.originCover||video.dynamicCover),episodes:1,category:category,tags:[category],vip:false,heat:String(stats.diggCount||stats.digg_count||''),views:String(stats.playCount||stats.play_count||''),creatorSecUid:author.secUid,creatorName:author.nickname,creatorId:author.uniqueId,creatorAvatar:author.avatar};}
+function ttStoredAddress(value){var urls=ttUrlList(value).filter(function(address){return !ttExpiredAddress(address);});return urls.length?{UrlList:urls,Height:ttNumber(value.Height||value.height),Width:ttNumber(value.Width||value.width)}:null;}
+function ttRemember(state,row){state.rows=state.rows||{};var video=row.video||{},author=ttAuthor(row.author),rates=ttArray(video.bitrateInfo||video.bitrate_info).slice(0,8).map(function(rate){var addr=ttStoredAddress(rate.PlayAddr||rate.playAddr||rate.play_addr);if(!addr)return null;return {PlayAddr:addr,Height:ttNumber(rate.Height||rate.height),Bitrate:ttNumber(rate.Bitrate||rate.bitrate),QualityType:ttText(rate.QualityType||rate.qualityType,64),GearName:ttText(rate.GearName||rate.gearName,64),CodecType:ttText(rate.CodecType||rate.codecType||rate.codec_type||rate.codecName||rate.codec_name,64),isH265:ttYes(rate.isH265||rate.is_h265),isBytevc1:ttYes(rate.isBytevc1||rate.is_bytevc1),isBytevc2:ttYes(rate.isBytevc2||rate.is_bytevc2),isAv1:ttYes(rate.isAv1||rate.is_av1)};}).filter(Boolean);var structured=ttStoredAddress(video.PlayAddrStruct||video.playAddrStruct);state.rows[String(row.id)]={id:String(row.id),fetchedAt:Date.now(),desc:ttText(row.desc,4000),author:author,stats:{diggCount:ttText((row.stats||{}).diggCount||'',32),playCount:ttText((row.stats||{}).playCount||'',32)},video:{cover:video.cover||video.originCover||video.dynamicCover||'',height:ttNumber(video.height),width:ttNumber(video.width),duration:ttNumber(video.duration),playAddr:typeof video.playAddr==='string'&&/^https:\/\//i.test(video.playAddr)?video.playAddr:'',PlayAddrStruct:structured,bitrateInfo:rates}};var ids=Object.keys(state.rows);while(ids.length>48)delete state.rows[ids.shift()];}
+function* ttRequest(route,params,post,referer){var address=TT_ORIGIN+route+(params&&Object.keys(params).length?'?'+query(params):'');var data=yield* json(address,{method:post?'POST':'GET',credential:true,headers:{'User-Agent':TT_UA,'Referer':referer||TT_ORIGIN+'/','Origin':TT_ORIGIN,'Accept':'application/json, text/plain, */*'}});if(data.statusCode!=null&&Number(data.statusCode)!==0)throw new Error('TikTok 接口返回业务错误');if(data.status_code!=null&&Number(data.status_code)!==0)throw new Error('TikTok 接口返回业务错误');return data;}
+function ttParams(category,cursor,mode){
+ var params={aid:'1988',app_language:'zh-Hans',app_name:'tiktok_web',browser_language:'zh-CN',browser_name:'Mozilla',browser_online:'true',browser_platform:'Win32',browser_version:'150.0.0.0',channel:'tiktok_web',cookie_enabled:'true',count:'12',coverFormat:'2',device_platform:'web_pc',language:'zh-Hans',os:'windows',pullType:'2',referer:'',root_referer:'',screen_height:'1080',screen_width:'1920',tz_name:'UTC'};
+ if(category==='following'){params.cursor=cursor||'0';params.from_page='homepage_hot';params.level='1';}
+ else if(mode==='itemID'){params.itemID=cursor||'0';}
+ else{params.cursor=cursor||'0';params.from_page='fyp';}
+ return params;
+}
+function ttRememberPage(state,category,rows){var feed=state.feeds[category]||{seen:[]},seen=feed.seen||[],lookup={};seen.forEach(function(id){lookup[id]=true;});var items=[];rows.forEach(function(row){if(!row||row.id==null)return;var id=String(row.id);ttRemember(state,row);if(!lookup[id]){lookup[id]=true;seen.push(id);items.push(ttDrama(state.rows[id],category==='following'?'关注':'推荐'));}});if(seen.length>600)seen=seen.slice(-600);feed.seen=seen;state.feeds[category]=feed;return items;}
+function* ttCatalog(category,page,state,force){
+ if(!TT_CATEGORIES.some(function(row){return row[0]===category;}))throw new Error('TikTok 信息流分类无效');
+ state.feeds=state.feeds||{};
+ state.rows=state.rows||{};
+ var feed=state.feeds[category]||{seen:[]};
+ if(page===1||force){feed={seen:[]};state.feeds[category]=feed;}
+ else if(category==='recommend'&&((feed.pageMode==='cursor'&&feed.cursor==null)||(feed.pageMode!=='cursor'&&feed.itemID==null))||category==='following'&&feed.cursor==null){throw new Error('分页位置已过期，请下拉刷新 TikTok 列表');}
+ var requestMode=category==='recommend'?(feed.pageMode||(feed.itemID!=null?'itemID':'cursor')):'cursor';
+ var requestCursor=category==='recommend'?(requestMode==='itemID'?String(feed.itemID||'0'):String(feed.cursor||'0')):String(feed.cursor||'0');
+ var data;
+ if(category==='recommend'){
+  var params=ttParams(category,requestCursor,requestMode);
+  try{
+   data=yield* ttRequest('/api/recommend/item_list/',params,requestMode==='itemID',TT_ORIGIN+'/');
+  }catch(error){
+   if(requestMode!=='cursor')throw error;
+   requestMode='itemID';
+   requestCursor=page===1?'0':String(feed.itemID||'0');
+   params=ttParams(category,requestCursor,requestMode);
+   data=yield* ttRequest('/api/recommend/item_list/',params,true,TT_ORIGIN+'/');
+  }
+ }else{
+  var params=ttParams(category,requestCursor,'cursor');
+  data=yield* ttRequest('/api/following/item_list/',params,false,TT_ORIGIN+'/following');
+ }
+ var rows=Array.isArray(data.itemList)?data.itemList:Array.isArray(data.items)?data.items:null;
+ if(category==='recommend'&&requestMode==='cursor'&&(!Array.isArray(rows)||(!rows.length&&page===1))){
+  requestMode='itemID';
+  requestCursor=page===1?'0':String(feed.itemID||'0');
+  var params=ttParams(category,requestCursor,requestMode);
+  data=yield* ttRequest('/api/recommend/item_list/',params,true,TT_ORIGIN+'/');
+  rows=Array.isArray(data.itemList)?data.itemList:Array.isArray(data.items)?data.items:null;
+ }
+ if(!Array.isArray(rows))throw new Error('TikTok 信息流结构无效');
+ var previous=requestCursor,next=previous,tailId='';
+ if(rows.length){var tail=rows[rows.length-1]||{};if(tail.id!=null)tailId=String(tail.id);}
+ if(category==='recommend'){
+  var responseCursor=data.cursor==null?'':String(data.cursor);
+  var cursorUsable=responseCursor!==''&&!(requestMode==='itemID'&&responseCursor==='0');
+  if(cursorUsable&&responseCursor!==previous){requestMode='cursor';next=responseCursor;}
+  else if(tailId&&tailId!==String(feed.itemID||'')){requestMode='itemID';next=tailId;}
+  feed.pageMode=requestMode;
+  if(requestMode==='cursor')feed.cursor=next;else feed.itemID=next;
+  if(tailId)feed.itemID=tailId;
+ }else{
+  if(data.cursor!=null)next=String(data.cursor);
+  feed.cursor=next;
+ }
+ var items=ttRememberPage(state,category,rows);
+ var upstreamMore=ttYes(data.hasMore)||ttYes(data.has_more);
+ var more=upstreamMore&&rows.length>0&&items.length>0&&next!==previous;
+ return {items:items,count:items.length,hasMore:more,fresh:true};
+}
+function ttExpiredAddress(address){var match=/(?:[?&])(?:x-expires|expires|expire|deadline)=(\d{1,13})(?:[&#]|$)/i.exec(address);if(!match)return false;var expiry=Number(match[1]);if(expiry>100000000000)expiry=Math.floor(expiry/1000);return expiry<=Math.floor(Date.now()/1000)+10;}
+function ttCodecPriority(rate){rate=rate||{};var value=String(rate.CodecType||rate.codecType||rate.codec_type||rate.codecName||rate.codec_name||'').toLowerCase();if(ttYes(rate.isAv1||rate.is_av1)||/av1|h266|bytevc2/.test(value)||ttYes(rate.isBytevc2||rate.is_bytevc2))return 0;if(/h264|avc/.test(value))return 3;if(/hevc|h265|bytevc1/.test(value)||ttYes(rate.isH265||rate.is_h265||rate.isBytevc1||rate.is_bytevc1))return 2;return 1;}
+function ttVariants(row){var video=row.video||{},choices=[],seen={};function add(address,height,codec,bitrate){var urls=typeof address==='string'&&/^https:\/\//i.test(address)?[address]:ttUrlList(address);urls.forEach(function(value){if(seen[value]||ttExpiredAddress(value))return;seen[value]=true;choices.push({url:value,height:ttNumber(height||(address&&address.Height)||video.height),codecPriority:ttCodecPriority(codec),bitrate:ttNumber(bitrate),headers:{'User-Agent':TT_UA,'Referer':TT_ORIGIN+'/@'+encodeURIComponent((row.author||{}).uniqueId||'_')+'/video/'+row.id}});});}ttArray(video.bitrateInfo).forEach(function(rate){var address=rate.PlayAddr||rate.playAddr||rate.play_addr;add(address,rate.Height||rate.height,rate,rate.Bitrate||rate.bitrate);});add(video.PlayAddrStruct||video.playAddrStruct,video.height,{},0);add(video.playAddr,video.height,{},0);choices.sort(function(a,b){return b.codecPriority-a.codecPriority||b.height-a.height||b.bitrate-a.bitrate;});if(!choices.length)return [];var selectedCodec=choices[0].codecPriority;return choices.filter(function(row){return row.codecPriority===selectedCodec;}).slice(0,4);}
+function* ttVideoRow(id,drama,state){
+ var cached=state.rows&&state.rows[id],author=cached&&cached.author||{},name=author.uniqueId||drama.creatorId||'';
+ if(!/^\d+$/.test(id)||!name) {var error=new Error('Video metadata unavailable');error.sourceError='tiktok_video';throw error;}
+ var html=yield* http(TT_ORIGIN+'/@'+encodeURIComponent(name)+'/video/'+id,{credential:true,headers:{'User-Agent':TT_UA,'Referer':TT_ORIGIN+'/','Accept':'text/html,application/xhtml+xml'}});
+ var match=/<script\b[^>]*\bid=["']__UNIVERSAL_DATA_FOR_REHYDRATION__["'][^>]*>([\s\S]*?)<\/script>/i.exec(html),data=match?JSON.parse(match[1]):null,scope=data&&data.__DEFAULT_SCOPE__||{},detail=scope['webapp.video-detail']||{},row=(detail.itemInfo||{}).itemStruct;
+ if(!row||String(row.id)!==id||!ttVariants(row).length){var error=new Error('Video media unavailable');error.sourceError='tiktok_video';throw error;}
+ ttRemember(state,row);return state.rows[id];
+}
+function* ttFindRow(id,drama,state,force){state.rows=state.rows||{};var cached=state.rows[id],fetchedAt=Number(cached&&cached.fetchedAt)||0,isFresh=fetchedAt>0&&Date.now()-fetchedAt<TT_ADDRESS_MAX_AGE_MS;if(!force&&cached&&isFresh&&ttVariants(cached).length)return cached;return yield* ttVideoRow(id,drama,state);}
+function* sourceExecute(action,input,state){var drama=input.drama||{},id=String(drama.sourceId||String(drama.id||'').split(':').pop());if(action==='categories')return {items:TT_CATEGORIES.map(function(row){return {id:row[0],name:row[1]};})};if(action==='catalog'||action==='check'){return yield* ttCatalog(input.category||'recommend',Number(input.page)||1,state,input.force===true);}if(action==='detail'||action==='metadata'){var row=yield* ttFindRow(id,drama,state),category=drama.category==='关注'?'关注':'推荐';return single(ttDrama(row,category));}if(action==='resolve'){var row=yield* ttFindRow(id,drama,state,input.force===true);var plan=select(ttVariants(row),Number(input.quality)||0);plan.source='tiktok';plan.browser=true;plan.variants.forEach(function(item){item.source='tiktok';item.browser=true;});return plan;}return {error:'TikTok 订阅当前不支持此操作'};}
