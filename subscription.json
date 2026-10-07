@@ -38,7 +38,7 @@
       "api": 2,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.2.4",
+      "version": "0.2.5",
       "credentialDomains": [
         "www.douyin.com",
         "live.douyin.com",
@@ -166,154 +166,13 @@
             "comments"
           ],
           "family": "douyin",
-          "kind": "video",
+          "kind": "drama",
           "credentialGroup": "douyin",
           "credentialRequired": true
         }
       ],
       "url": "sources/douyin.json",
-      "sha256": "c5bda8f563f721b688bab88e7357a2724f832f961172a92d29d704e20f0133bc"
-    },
-    {
-      "schema": 1,
-      "api": 2,
-      "status": "draft",
-      "engine": "javascript-generator-v1",
-      "version": "0.1.2",
-      "credentialDomains": [
-        "www.douyin.com",
-        "live.douyin.com",
-        "www-hj.douyin.com"
-      ],
-      "description": "组合订阅，子项独立开关；需要支持组合订阅的客户端",
-      "id": "douyin-test",
-      "name": "抖音（测试版）",
-      "domains": [
-        "live.douyin.com",
-        "www-hj.douyin.com",
-        "www.douyin.com"
-      ],
-      "capabilities": [
-        "catalog",
-        "categories",
-        "comments",
-        "creator",
-        "danmaku",
-        "detail",
-        "live",
-        "resolve"
-      ],
-      "family": "douyin",
-      "kind": "video",
-      "credentialGroup": "douyin",
-      "credentialRequired": true,
-      "children": [
-        {
-          "credentialDomains": [
-            "www.douyin.com",
-            "live.douyin.com",
-            "www-hj.douyin.com"
-          ],
-          "description": "可独立更新的本地站源程序",
-          "id": "douyin-test",
-          "name": "抖音短视频（测试）",
-          "domains": [
-            "www.douyin.com",
-            "live.douyin.com",
-            "www-hj.douyin.com"
-          ],
-          "capabilities": [
-            "catalog",
-            "categories",
-            "detail",
-            "resolve",
-            "creator",
-            "comments",
-            "danmaku"
-          ],
-          "family": "douyin",
-          "kind": "video",
-          "credentialGroup": "douyin",
-          "credentialRequired": true
-        },
-        {
-          "credentialDomains": [
-            "www.douyin.com",
-            "live.douyin.com"
-          ],
-          "description": "可独立更新的本地站源程序",
-          "id": "douyin-live-test",
-          "name": "抖音直播（测试）",
-          "domains": [
-            "www.douyin.com",
-            "live.douyin.com"
-          ],
-          "capabilities": [
-            "catalog",
-            "categories",
-            "detail",
-            "resolve",
-            "creator",
-            "live"
-          ],
-          "family": "douyin",
-          "kind": "live",
-          "credentialGroup": "douyin",
-          "credentialRequired": true
-        },
-        {
-          "credentialDomains": [
-            "www.douyin.com",
-            "live.douyin.com"
-          ],
-          "description": "可独立更新的本地站源程序",
-          "id": "douyin-series-test",
-          "name": "抖音短剧（测试）",
-          "domains": [
-            "www.douyin.com",
-            "live.douyin.com"
-          ],
-          "capabilities": [
-            "catalog",
-            "categories",
-            "detail",
-            "resolve",
-            "creator",
-            "comments"
-          ],
-          "family": "douyin",
-          "kind": "drama",
-          "credentialGroup": "douyin",
-          "credentialRequired": true
-        },
-        {
-          "credentialDomains": [
-            "www.douyin.com",
-            "live.douyin.com"
-          ],
-          "description": "可独立更新的本地站源程序",
-          "id": "douyin-theater-test",
-          "name": "抖音放映厅（测试）",
-          "domains": [
-            "www.douyin.com",
-            "live.douyin.com"
-          ],
-          "capabilities": [
-            "catalog",
-            "categories",
-            "detail",
-            "resolve",
-            "creator",
-            "comments"
-          ],
-          "family": "douyin",
-          "kind": "video",
-          "credentialGroup": "douyin",
-          "credentialRequired": true
-        }
-      ],
-      "url": "sources/douyin-test.json",
-      "sha256": "30ecfb3931c8f2519a001fce0215053ff574bc164f75b12aaa40c1f712ba8c27"
+      "sha256": "5e1933c685c743a3952069a61ec88f24c70ee06059a254ec5d97b413544c9f6f"
     },
     {
       "schema": 1,

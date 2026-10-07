@@ -28,19 +28,7 @@ SOURCES = [
            BASIC + ["creator", "comments"], family="douyin", kind="drama", version="0.1.4",
            credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DOMAINS),
     source("douyin-theater", "抖音放映厅", ["douyin"], DOUYIN_DOMAINS,
-           BASIC + ["creator", "comments"], family="douyin", kind="video", version="0.1.4",
-           credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DOMAINS),
-    source("douyin-test", "抖音短视频（测试）", ["douyin"], DOUYIN_DANMAKU_DOMAINS,
-           BASIC + ["creator", "comments", "danmaku"], family="douyin", kind="video", version="0.1.2",
-           credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DANMAKU_DOMAINS),
-    source("douyin-live-test", "抖音直播（测试）", ["douyin"], DOUYIN_DOMAINS,
-           BASIC + ["creator", "live"], family="douyin", kind="live", version="0.1.2",
-           credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DOMAINS),
-    source("douyin-series-test", "抖音短剧（测试）", ["douyin"], DOUYIN_DOMAINS,
-           BASIC + ["creator", "comments"], family="douyin", kind="drama", version="0.1.2",
-           credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DOMAINS),
-    source("douyin-theater-test", "抖音放映厅（测试）", ["douyin"], DOUYIN_DOMAINS,
-           BASIC + ["creator", "comments"], family="douyin", kind="video", version="0.1.2",
+           BASIC + ["creator", "comments"], family="douyin", kind="drama", version="0.1.5",
            credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DOMAINS),
     source("bilibili", "Bilibili 视频", ["bilibili"], ["api.bilibili.com"],
            BASIC + ["creator", "comments", "account", "search", "danmaku"], kind="video", version="0.2.1",
@@ -97,13 +85,12 @@ def main():
         entries.append(dict(metadata, url="sources/"+record["id"]+".json", sha256=hashlib.sha256(content).hexdigest()))
     groups = [
         ("douyin", "抖音", ["douyin", "douyin-live", "douyin-series", "douyin-theater"]),
-        ("douyin-test", "抖音（测试版）", ["douyin-test", "douyin-live-test", "douyin-series-test", "douyin-theater-test"]),
         ("bilibili", "Bilibili", ["bilibili", "bilibili-live"]),
         ("huangguo", "黄果", ["huangguoai", "huangguo-video", "cloudfront"]),
     ]
     for identifier, name, members in groups:
         base = dict(packages[members[0]])
-        bundle_version = {"douyin": "0.2.4", "douyin-test": "0.1.2", "bilibili": "0.3.2"}.get(identifier, "0.2.0")
+        bundle_version = {"douyin": "0.2.5", "bilibili": "0.3.2"}.get(identifier, "0.2.0")
         base.update(id=identifier, name=name, api=2, version=bundle_version,
                     description="组合订阅，子项独立开关；需要支持组合订阅的客户端",
                     domains=sorted({host for key in members for host in packages[key]["domains"]}),
