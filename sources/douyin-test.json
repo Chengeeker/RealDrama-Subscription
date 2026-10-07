@@ -3,15 +3,15 @@
   "api": 2,
   "status": "draft",
   "engine": "javascript-generator-v1",
-  "version": "0.2.4",
+  "version": "0.1.2",
   "credentialDomains": [
     "www.douyin.com",
     "live.douyin.com",
     "www-hj.douyin.com"
   ],
   "description": "组合订阅，子项独立开关；需要支持组合订阅的客户端",
-  "id": "douyin",
-  "name": "抖音",
+  "id": "douyin-test",
+  "name": "抖音（测试版）",
   "domains": [
     "live.douyin.com",
     "www-hj.douyin.com",
@@ -40,8 +40,8 @@
         "www-hj.douyin.com"
       ],
       "description": "可独立更新的本地站源程序",
-      "id": "douyin",
-      "name": "抖音短视频",
+      "id": "douyin-test",
+      "name": "抖音短视频（测试）",
       "domains": [
         "www.douyin.com",
         "live.douyin.com",
@@ -67,8 +67,8 @@
         "live.douyin.com"
       ],
       "description": "可独立更新的本地站源程序",
-      "id": "douyin-live",
-      "name": "抖音直播",
+      "id": "douyin-live-test",
+      "name": "抖音直播（测试）",
       "domains": [
         "www.douyin.com",
         "live.douyin.com"
@@ -92,8 +92,8 @@
         "live.douyin.com"
       ],
       "description": "可独立更新的本地站源程序",
-      "id": "douyin-series",
-      "name": "抖音短剧",
+      "id": "douyin-series-test",
+      "name": "抖音短剧（测试）",
       "domains": [
         "www.douyin.com",
         "live.douyin.com"
@@ -117,8 +117,8 @@
         "live.douyin.com"
       ],
       "description": "可独立更新的本地站源程序",
-      "id": "douyin-theater",
-      "name": "抖音放映厅",
+      "id": "douyin-theater-test",
+      "name": "抖音放映厅（测试）",
       "domains": [
         "www.douyin.com",
         "live.douyin.com"

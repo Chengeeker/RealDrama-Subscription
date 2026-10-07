@@ -3,14 +3,14 @@
   "api": 1,
   "status": "draft",
   "engine": "javascript-generator-v1",
-  "version": "0.1.4",
+  "version": "0.1.2",
   "credentialDomains": [
     "www.douyin.com",
     "live.douyin.com"
   ],
   "description": "可独立更新的本地站源程序",
-  "id": "douyin-live",
-  "name": "抖音直播",
+  "id": "douyin-live-test",
+  "name": "抖音直播（测试）",
   "domains": [
     "www.douyin.com",
     "live.douyin.com"
