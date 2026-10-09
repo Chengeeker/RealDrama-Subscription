@@ -50,6 +50,7 @@ SOURCES = [
     source("huangju", "剧果", ["huangju"], ["api.huangju.net"], BASIC + ["search", "download"]),
     source("dsd", "帝果", ["dsd"], ["www.dsd.com.se"], BASIC + ["search", "download"]),
     source("crj91", "91成人短剧", ["crj91"], ["91crdj.com"], BASIC + ["search", "download"], version="0.1.1"),
+    source("hanime", "Hanime（18+）", ["hanime"], ["hanime1.me"], BASIC + ["search"], kind="video", version="0.1.1", browser=True, credentialGroup="hanime", credentialRequired=False, credentialDomains=["hanime1.me"], browserCredentialDomains=["hanime1.me"], description="仅限 18 岁以上用户；Chrome 兼容请求，可选本地 Cookie，并识别 Cloudflare 验证页"),
     source("stripchat", "Stripchat 成人直播", ["stripchat"], ["zh.stripchat.global", "zh.stripol.com", "zh.stripchat.com",
            "edge-hls.doppiocdn.org", "edge-hls.doppiocdn.media", "edge-hls.growcdnssedge.com", "edge-hls.sacfedge.com"],
            BASIC + ["search", "playlistRewrite"], kind="live", version="0.1.1"),

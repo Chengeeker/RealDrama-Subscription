@@ -408,6 +408,38 @@
       "status": "draft",
       "engine": "javascript-generator-v1",
       "version": "0.1.1",
+      "credentialDomains": [
+        "hanime1.me"
+      ],
+      "description": "仅限 18 岁以上用户；Chrome 兼容请求，可选本地 Cookie，并识别 Cloudflare 验证页",
+      "id": "hanime",
+      "name": "Hanime（18+）",
+      "domains": [
+        "hanime1.me"
+      ],
+      "capabilities": [
+        "catalog",
+        "categories",
+        "detail",
+        "resolve",
+        "search"
+      ],
+      "kind": "video",
+      "browser": true,
+      "credentialGroup": "hanime",
+      "credentialRequired": false,
+      "browserCredentialDomains": [
+        "hanime1.me"
+      ],
+      "url": "sources/hanime.json",
+      "sha256": "ce566fcd7de1c9a86fab3fff16a4f7d46f608e0ee2f567b0fb0b1dfabe2e1646"
+    },
+    {
+      "schema": 1,
+      "api": 1,
+      "status": "draft",
+      "engine": "javascript-generator-v1",
+      "version": "0.1.1",
       "credentialDomains": [],
       "description": "可独立更新的本地站源程序",
       "id": "stripchat",
