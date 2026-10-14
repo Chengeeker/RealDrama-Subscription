@@ -383,13 +383,13 @@
       "api": 1,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "credentialDomains": [],
       "description": "可独立更新的本地站源程序",
       "id": "crj91",
       "name": "91成人短剧",
       "domains": [
-        "91crdj.com"
+        "91crdjai.com"
       ],
       "capabilities": [
         "catalog",
@@ -400,7 +400,7 @@
         "download"
       ],
       "url": "sources/crj91.json",
-      "sha256": "d0321fbb5ff471f4aaffcaa6337e53e7cb7f6087a1e4b9eb1087e796d9160f51"
+      "sha256": "ae823d95d11632bf7c6d0febb34a93a2b512d152858499c65b6f0acb60f032ba"
     },
     {
       "schema": 1,

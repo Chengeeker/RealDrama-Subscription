@@ -49,7 +49,7 @@ SOURCES = [
     source("sorani", "青空", ["sorani"], ["api.sorani.cc"], BASIC + ["search", "download"]),
     source("huangju", "剧果", ["huangju"], ["api.huangju.net"], BASIC + ["search", "download"]),
     source("dsd", "帝果", ["dsd"], ["www.dsd.com.se"], BASIC + ["search", "download"]),
-    source("crj91", "91成人短剧", ["crj91"], ["91crdj.com"], BASIC + ["search", "download"], version="0.1.1"),
+    source("crj91", "91成人短剧", ["crj91"], ["91crdjai.com"], BASIC + ["search", "download"], version="0.1.2"),
     source("stripchat", "Stripchat 成人直播", ["stripchat"], ["zh.stripchat.global", "zh.stripol.com", "zh.stripchat.com",
            "edge-hls.doppiocdn.org", "edge-hls.doppiocdn.media", "edge-hls.growcdnssedge.com", "edge-hls.sacfedge.com"],
            BASIC + ["search", "playlistRewrite"], kind="live", version="0.1.1"),
