@@ -9,7 +9,7 @@
       "api": 1,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.1.3",
+      "version": "0.1.4",
       "credentialDomains": [],
       "description": "真人剧、漫剧、AI 剧；App、网页及备用公开播放接口",
       "id": "hongguo",
@@ -31,7 +31,7 @@
         "catalogTools"
       ],
       "url": "sources/hongguo.json",
-      "sha256": "cd94dee06f89e797f541191f940459aabe23fc9ebea8478e4f13ee4e04a874f3"
+      "sha256": "14162b5bb26f5ad3481bb001a3202ccffb07a0eca551bf1a53a4233a16f68ec9"
     },
     {
       "schema": 1,
