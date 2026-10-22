@@ -3,14 +3,14 @@ var DY_CHANNELS=[['jingxuan','精选',''],['course','公开课','100000'],['film
 var DY_SERIES=[['recommend','推荐',''],['rank','排行榜','1'],['love','爱情','1940'],['drama','剧情','1957'],['comeback','逆袭','1944'],['twist','反转','2092'],['family','家庭','1941'],['grudge','复仇','2091'],['fantasy','玄幻','1946'],['magic','奇幻','1945'],['costume','古装','1958'],['mystery','悬疑','1950'],['friendship','友情','1942'],['comedy','喜剧','1956'],['crime','犯罪','2088'],['thriller','惊悚','1951'],['youth','青春','1943'],['scifi','科幻','1947'],['xianxia','仙侠','1948'],['other','其他','1959']];
 var DY_THEATER=[['vs:variety','综艺','4','vs'],['vs:tv','电视剧','2','tv'],['vs:movie','电影','1','movie'],['vs:documentary','纪录片','5','documentary'],['vs:anime','动漫','3','anime']];
 function yes(value){return value===true||value===1||value==='1'||value==='true';}
-function* dyRequest(route,params,options){options=options||{};var host=options.host||'www.douyin.com';var fields=Object.assign({device_platform:'webapp',aid:'6383',channel:'channel_pc_web',version_code:'190600',version_name:'19.6.0',cookie_enabled:'true',browser_language:'zh-CN',browser_platform:'Win32',browser_name:'Chrome',browser_version:'116.0.0.0',browser_online:'true',engine_name:'Blink',engine_version:'116.0.0.0',os_name:'Windows',os_version:'10',screen_width:'1920',screen_height:'1080',platform:'PC',pc_client_type:'1',support_h265:'0',support_dash:'0'},params||{});var q=query(fields);return yield* json('https://'+host+route+'?'+q,{method:options.post?'POST':'GET',credential:true,sign:true,headers:{'User-Agent':DY_UA,'Referer':options.referer||'https://'+host+'/','Accept':'application/json','Origin':'https://www.douyin.com'}});}
+function* dyRequest(route,params,options){options=options||{};var host=options.host||'www.douyin.com';var fields=Object.assign({device_platform:'webapp',aid:'6383',channel:'channel_pc_web',version_code:'190600',version_name:'19.6.0',cookie_enabled:'true',browser_language:'zh-CN',browser_platform:'Win32',browser_name:'Chrome',browser_version:'116.0.0.0',browser_online:'true',engine_name:'Blink',engine_version:'116.0.0.0',os_name:'Windows',os_version:'10',screen_width:'1920',screen_height:'1080',platform:'PC',pc_client_type:'1',support_h265:'0',support_dash:'0'},params||{});var q=query(fields);try{if(typeof getABogus==='function'){var ab=getABogus(q,DY_UA);if(ab)q+='&a_bogus='+encodeURIComponent(ab);}}catch(_){}return yield* json('https://'+host+route+'?'+q,{method:options.post?'POST':'GET',credential:true,sign:typeof getABogus!=='function',headers:{'User-Agent':DY_UA,'Referer':options.referer||'https://'+host+'/','Accept':'application/json','Origin':'https://www.douyin.com'}});}
 function dyVariants(row){var video=row.video||{},choices=[];[['play_addr_h264',4],['play_addr',3],['play_addr_lowbr',2],['play_addr_720p',2],['play_addr_265',1]].forEach(function(field){array(video[field[0]]&&video[field[0]].url_list).forEach(function(address){choices.push({url:address,height:Number(video.height)||0,priority:field[1]});});});array(video.bit_rate).forEach(function(rate){var addr=rate.play_addr||{};array(addr.url_list).forEach(function(address){choices.push({url:address,height:Number(addr.height||video.height)||0,priority:yes(rate.is_h265)?1:4});});});return choices.filter(function(row){return /^https:\/\//.test(row.url);}).sort(function(a,b){return b.height-a.height||b.priority-a.priority;});}
-function dyDrama(row,source,category){var author=row.author||{},stats=row.statistics||{},video=row.video||{},id=String(row.aweme_id||'');return {id:source+':'+id,source:source,sourceId:id,title:String(row.desc||author.nickname||'抖音视频'),description:String(row.desc||''),cover:url(video.cover),episodes:1,category:category||'短视频',tags:[category||'短视频'],vip:false,heat:String(stats.digg_count||''),views:String(stats.play_count||''),creatorSecUid:String(author.sec_uid||''),creatorName:String(author.nickname||''),creatorId:String(author.unique_id||author.short_id||''),creatorAvatar:url(author.avatar_thumb||author.avatar_medium)};}
+function dyDrama(row,source,category){var author=row.author||{},stats=row.statistics||{},video=row.video||{},id=String(row.aweme_id||'');return {id:source+':'+id,source:source,sourceId:id,title:String(row.desc||author.nickname||author.name||'抖音视频'),description:String(row.desc||''),cover:url(video.cover),episodes:1,category:category||'短视频',tags:[category||'短视频'],vip:false,heat:String(stats.digg_count||''),views:String(stats.play_count||''),creatorSecUid:String(author.sec_uid||author.sec_user_id||row.sec_user_id||author.uid||author.id||''),creatorName:String(author.nickname||author.name||''),creatorId:String(author.unique_id||author.short_id||author.uid||''),creatorAvatar:url(author.avatar_thumb||author.avatar_medium||author.avatar_larger)};}
 function dyRemember(state,row){state.rows=state.rows||{};var video=row.video||{};state.rows[String(row.aweme_id)]={storedAt:Date.now(),aweme_id:String(row.aweme_id),desc:row.desc,author:row.author,statistics:row.statistics,video:{duration:video.duration,height:video.height,cover:video.cover,play_addr_h264:video.play_addr_h264,play_addr:video.play_addr,play_addr_lowbr:video.play_addr_lowbr,play_addr_720p:video.play_addr_720p,play_addr_265:video.play_addr_265,bit_rate:video.bit_rate}};var ids=Object.keys(state.rows);while(ids.length>80)delete state.rows[ids.shift()];}
 function dyTheaterPaid(row){var pay=row.pay_info||{},charge=row.charge_info||{};return Number(pay.charge_count)>0||Number(charge.charge_count)>0||['is_paid','is_charge','is_vip','is_locked'].some(function(key){return yes(row[key])||yes(pay[key]);});}
-function dyTheaterRemember(state,row,category){var brief=row.lvideo_brief||{},album=brief.album_info||{},episode=brief.episode_info||{},awemeId=String(row.aweme_id||''),albumId=String(album.album_id||''),episodeId=String(episode.episode_id||'');if(!awemeId||!albumId||!episodeId)return null;var author=row.author||{},item={awemeId:awemeId,albumId:albumId,episodeId:episodeId,title:String(album.title||episode.title||row.desc||'\u6296\u97f3\u653e\u6620\u5385'),description:String(album.intro||row.desc||''),cover:url(album.cover||episode.cover||(row.video||{}).cover),episodes:Number(album.seqs_count)||1,category:category,vip:dyTheaterPaid(album),creatorName:String(author.nickname||''),creatorSecUid:String(author.sec_uid||''),creatorId:String(author.unique_id||author.short_id||''),creatorAvatar:url(author.avatar_thumb||author.avatar_medium)};state.theaterRows=state.theaterRows||{};state.theaterRows[awemeId]=item;var ids=Object.keys(state.theaterRows);while(ids.length>80)delete state.theaterRows[ids.shift()];return item;}
+function dyTheaterRemember(state,row,category){var brief=row.lvideo_brief||{},album=brief.album_info||{},episode=brief.episode_info||{},awemeId=String(row.aweme_id||''),albumId=String(album.album_id||''),episodeId=String(episode.episode_id||'');if(!awemeId||!albumId||!episodeId)return null;var author=row.author||{},item={awemeId:awemeId,albumId:albumId,episodeId:episodeId,title:String(album.title||episode.title||row.desc||'\u6296\u97f3\u653e\u6620\u5385'),description:String(album.intro||row.desc||''),cover:url(album.cover||episode.cover||(row.video||{}).cover),episodes:Number(album.seqs_count)||1,category:category,vip:dyTheaterPaid(album),creatorName:String(author.nickname||author.name||''),creatorSecUid:String(author.sec_uid||author.sec_user_id||row.sec_user_id||author.uid||author.id||''),creatorId:String(author.unique_id||author.short_id||author.uid||''),creatorAvatar:url(author.avatar_thumb||author.avatar_medium||author.avatar_larger)};state.theaterRows=state.theaterRows||{};state.theaterRows[awemeId]=item;var ids=Object.keys(state.theaterRows);while(ids.length>80)delete state.theaterRows[ids.shift()];return item;}
 function dyTheaterDrama(item,source){return {id:source+':'+item.awemeId,source:source,sourceId:item.awemeId,title:item.title,description:item.description,cover:item.cover,episodes:item.episodes,category:item.category,tags:[item.category],vip:item.vip,creatorName:item.creatorName,creatorSecUid:item.creatorSecUid,creatorId:item.creatorId,creatorAvatar:item.creatorAvatar};}
-function dySeriesDrama(row,category,source){var author=row.author||{},stats=row.stats||{},charge=row.charge_info||{},id=String(row.series_id||''),site=source||'douyin-series';return {id:site+':'+id,source:site,sourceId:id,title:String(row.series_name||'抖音短剧'),description:String(row.desc||''),cover:url(row.cover_url||row.cover),episodes:Number(stats.total_episode)||0,category:category||'短剧',tags:['短剧',category||'短剧'],vip:Number(charge.charge_count)>0||yes(row.is_charge_series),heat:String(stats.play_vv||stats.play_count||''),views:String(stats.play_vv||stats.play_count||''),creatorName:String(author.nickname||''),creatorSecUid:String(author.sec_uid||''),creatorId:String(author.unique_id||author.short_id||''),creatorAvatar:url(author.avatar_thumb||author.avatar_medium)};}
+function dySeriesDrama(row,category,source){var author=row.author||{},stats=row.stats||{},charge=row.charge_info||{},id=String(row.series_id||''),site=source||'douyin-series';return {id:site+':'+id,source:site,sourceId:id,title:String(row.series_name||'抖音短剧'),description:String(row.desc||''),cover:url(row.cover_url||row.cover),episodes:Number(stats.total_episode)||0,category:category||'短剧',tags:['短剧',category||'短剧'],vip:Number(charge.charge_count)>0||yes(row.is_charge_series),heat:String(stats.play_vv||stats.play_count||''),views:String(stats.play_vv||stats.play_count||''),creatorName:String(author.nickname||author.name||''),creatorSecUid:String(author.sec_uid||author.sec_user_id||row.sec_user_id||author.uid||author.id||''),creatorId:String(author.unique_id||author.short_id||author.uid||''),creatorAvatar:url(author.avatar_thumb||author.avatar_medium||author.avatar_larger)};}
 function dyRoomDrama(room,id,source){var owner=room.owner||{},site=source||'douyin-live';return {id:site+':'+id,source:site,sourceId:String(id),title:String(room.title||'抖音直播'),description:String(owner.nickname||''),cover:url(room.cover),episodes:1,category:'直播',tags:['直播'],vip:false,creatorName:String(owner.nickname||''),creatorSecUid:String(owner.sec_uid||owner.sec_user_id||''),creatorId:String(owner.unique_id||owner.short_id||''),creatorAvatar:url(owner.avatar_thumb||owner.avatar_medium)};}
 function* dyReadRoom(id){var response=yield* dyRequest('/webcast/room/web/enter/',{aid:'6383',app_name:'douyin_web',live_id:'1',device_platform:'web',language:'zh-CN',browser_name:'Chrome',browser_version:'125.0.0.0',web_rid:id},{host:'live.douyin.com',referer:'https://live.douyin.com/'+id});var data=response.data||{},room=array(data.data)[0];if(!room)throw new Error('直播已结束或账号无法访问');room.owner=Object.assign({},room.owner||{},data.user||{});return room;}
 function dyLivePlan(room,id,quality){if(Number(room.status)!==2)throw new Error('该直播间当前未开播');var stream=room.stream_url||{},pull=(stream.live_core_sdk_data||{}).pull_data||{},raw=pull.stream_data||{},data=typeof raw==='string'?JSON.parse(raw):raw;data=data.data||data;var choices=[],levels=array((pull.options||{}).qualities);levels.forEach(function(level){var main=(data[level.sdk_key]||{}).main||{};[main.hls,main.flv].forEach(function(address){if(address)choices.push({url:String(address).replace(/^http:/,'https:'),height:Number(level.level)||0});});});Object.keys(data).forEach(function(key){var main=(data[key]||{}).main||{};[main.hls,main.flv].forEach(function(address){if(address)choices.push({url:String(address).replace(/^http:/,'https:'),height:0});});});if(stream.hls_pull_url)choices.push({url:String(stream.hls_pull_url).replace(/^http:/,'https:'),height:0});['hls_pull_url_map','flv_pull_url'].forEach(function(key){Object.keys(stream[key]||{}).forEach(function(name){choices.push({url:String(stream[key][name]).replace(/^http:/,'https:'),height:0});});});choices.forEach(function(row){row.headers={'User-Agent':DY_UA,'Referer':'https://live.douyin.com/'+id};});return select(choices,quality);}
@@ -29,8 +29,9 @@ function* sourceExecute(action,input,state){var source=input.source,drama=input.
   }else if(douyinSeries){
    var channel=DY_SERIES.find(function(row){return row[0]===category;});if(!channel)throw new Error('分类已失效');response=yield* dyRequest('/aweme/v1/web/series/card/feed/',Object.assign({offset:feed.cursor,count:'16'},channel[2]?{content_type:channel[2]}:{}),{referer:'https://www.douyin.com/series'});if(!Array.isArray(response.card_list))throw new Error('未返回短剧列表');response.card_list.forEach(function(card){var row=Object.assign({},card,card.series||card.series_info||{});if(row.series_id)items.push(dySeriesDrama(row,channel[1],source));});more=yes(response.has_more)&&String(response.offset)!==feed.cursor;feed.cursor=String(response.offset||'0');
   }else{
-   for(var attempt=0;attempt<3;attempt++){
-    if(attempt&&(!more||items.length>=12))break;
+   var maxAttempts=page===1?1:2;
+   for(var attempt=0;attempt<maxAttempts;attempt++){
+    if(attempt&&(!more||items.length>=6))break;
     var options={},params,route,course=category==='course';
     if(douyinTheater){var channel=DY_THEATER.find(function(row){return row[0]===category;});if(!channel)throw new Error('分类已失效');route='/aweme/v1/web/lvideo/theater/feed';params={cursor:feed.cursor,count:'20',custom_album_type:channel[2]};options.referer='https://www.douyin.com/vschannel/'+channel[3];}
     else if(category==='follow'){route='/aweme/v1/web/follow/feed/';params={count:'20',cursor:feed.cursor,level:'1',pull_type:page===1?'2':'1'};options.referer='https://www.douyin.com/follow';}
@@ -61,35 +62,46 @@ function* sourceExecute(action,input,state){var source=input.source,drama=input.
   var secUid=drama.creatorSecUid;
   if(!secUid){
    var cachedRow=state.rows&&state.rows[id];
-   if(cachedRow&&cachedRow.author&&cachedRow.author.sec_uid)secUid=String(cachedRow.author.sec_uid);
+   if(cachedRow&&cachedRow.author&&(cachedRow.author.sec_uid||cachedRow.author.sec_user_id))
+    secUid=String(cachedRow.author.sec_uid||cachedRow.author.sec_user_id);
   }
   if(!secUid){
-   if(douyinLive){drama=dyRoomDrama(yield* dyReadRoom(id),id,source);secUid=drama.creatorSecUid;}
-   else{
-    var detail=yield* dyRequest('/aweme/v1/web/aweme/detail/',{aweme_id:id},{referer:'https://www.douyin.com/video/'+id});
-    var row=detail.aweme_detail||{};
-    if(row.aweme_id)dyRemember(state,row);
-    drama=dyDrama(row,source);
-    secUid=drama.creatorSecUid;
+   if(douyinLive){
+    try{drama=dyRoomDrama(yield* dyReadRoom(id),id,source);secUid=drama.creatorSecUid;}catch(_){}
+   }else{
+    try{
+     var detail=yield* dyRequest('/aweme/v1/web/aweme/detail/',{aweme_id:id},{referer:'https://www.douyin.com/video/'+id});
+     var row=detail.aweme_detail||{};
+     if(row.aweme_id)dyRemember(state,row);
+     drama=dyDrama(row,source);
+     secUid=drama.creatorSecUid;
+    }catch(_){}
    }
   }
-  if(!secUid)throw new Error('未取得作者主页标识');
-  var cursor=input.cursor||'0',userReferer='https://www.douyin.com/user/'+secUid;
-  var response;
-  try{
-   response=yield* dyRequest('/aweme/v1/web/aweme/post/',{sec_user_id:secUid,max_cursor:cursor,count:'18',locate_query:'false',show_live_replay_strategy:'1',need_time_list:'0',time_list_query:'0',whale_cut_token:''},{referer:userReferer});
-  }catch(e){
-   if(cursor!=='0')throw e;
-   response={aweme_list:[],user_info:{nickname:drama.creatorName,sec_uid:secUid,unique_id:drama.creatorId},has_more:false};
+  var cursor=input.cursor||'0';
+  var postList=[];
+  var user={};
+  var maxCursor=cursor;
+  var hasMore=false;
+  if(secUid){
+   var userReferer='https://www.douyin.com/user/'+secUid;
+   try{
+    var response=yield* dyRequest('/aweme/v1/web/aweme/post/',{sec_user_id:secUid,max_cursor:cursor,count:'18',locate_query:'false',show_live_replay_strategy:'1',need_time_list:'0',time_list_query:'0',whale_cut_token:''},{referer:userReferer});
+    if(response&&Array.isArray(response.aweme_list)){
+     postList=response.aweme_list;
+    }
+    user=(response&&(response.user_info||response.user))||{};
+    maxCursor=String((response&&response.max_cursor)||cursor);
+    hasMore=yes(response&&response.has_more)&&maxCursor!==cursor;
+   }catch(err){
+    if(cursor!=='0')throw err;
+   }
   }
-  var postList=Array.isArray(response.aweme_list)?response.aweme_list:[];
-  if(!Array.isArray(response.aweme_list)&&response.status_code&&response.status_code!==0)throw new Error('作者作品列表未返回');
-  var user=response.user_info||response.user||{};
   var items=postList.filter(function(row){return row.aweme_id&&dyVariants(row).length;}).map(function(row){dyRemember(state,row);return dyDrama(row,videoSource);});
   if(!items.length&&cursor==='0'&&state.rows){
    Object.keys(state.rows).forEach(function(k){
     var r=state.rows[k];
-    if(r&&r.author&&(r.author.sec_uid===secUid||r.author.nickname===drama.creatorName)){
+    if(r&&r.author&&(r.author.sec_uid===secUid||r.author.sec_user_id===secUid||(drama.creatorName&&r.author.nickname===drama.creatorName))){
      items.push(dyDrama(r,videoSource));
     }
    });
@@ -97,7 +109,7 @@ function* sourceExecute(action,input,state){var source=input.source,drama=input.
   if(!items.length&&cursor==='0'&&drama.sourceId){
    items.push(drama);
   }
-  return {items:items,name:String(user.nickname||drama.creatorName||''),avatar:url(user.avatar_thumb||user.avatar_medium)||drama.creatorAvatar,userId:String(user.unique_id||user.short_id||drama.creatorId||''),bio:String(user.signature||''),likes:user.total_favorited,following:user.following_count,followers:user.follower_count,cursor:String(response.max_cursor||cursor),hasMore:yes(response.has_more)&&String(response.max_cursor||'')!==cursor};
+  return {items:items,name:String(user.nickname||drama.creatorName||''),avatar:url(user.avatar_thumb||user.avatar_medium)||drama.creatorAvatar,userId:String(user.unique_id||user.short_id||drama.creatorId||''),bio:String(user.signature||''),likes:user.total_favorited,following:user.following_count,followers:user.follower_count,cursor:maxCursor,hasMore:hasMore};
  }
  if(douyinLive&&(action==='detail'||action==='resolve'||action==='live')){var room=yield* dyReadRoom(id),item=dyRoomDrama(room,id,source);if(action==='detail')return single(item);var plan=dyLivePlan(room,id,Number(input.quality)||0);return action==='live'?{drama:item,plan:plan}:plan;}
  if(douyinSeries&&action==='detail'){

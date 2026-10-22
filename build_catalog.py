@@ -18,17 +18,17 @@ SOURCES = [
            ["api5-normal-sinfonlineb.fqnovel.com", "hongguoduanju.com", "djapi.999888456.xyz"],
            BASIC + ["search", "suggestions", "rankings", "download", "catalogTools"],
            description="真人剧、漫剧、AI 剧；App、网页及备用公开播放接口", version="0.1.4"),
-    source("douyin", "抖音短视频", ["douyin"], DOUYIN_DANMAKU_DOMAINS,
-           BASIC + ["creator", "comments", "danmaku"], family="douyin", kind="video", version="0.1.4",
+    source("douyin", "抖音短视频", ["douyin_abogus", "douyin"], DOUYIN_DANMAKU_DOMAINS,
+           BASIC + ["creator", "comments", "danmaku"], family="douyin", kind="video", version="0.1.5",
            credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DANMAKU_DOMAINS),
-    source("douyin-live", "抖音直播", ["douyin"], DOUYIN_DOMAINS,
-           BASIC + ["creator", "live"], family="douyin", kind="live", version="0.1.4",
+    source("douyin-live", "抖音直播", ["douyin_abogus", "douyin"], DOUYIN_DOMAINS,
+           BASIC + ["creator", "live"], family="douyin", kind="live", version="0.1.5",
            credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DOMAINS),
-    source("douyin-series", "抖音短剧", ["douyin"], DOUYIN_DOMAINS,
-           BASIC + ["creator", "comments"], family="douyin", kind="drama", version="0.1.4",
-           credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DOMAINS),
-    source("douyin-theater", "抖音放映厅", ["douyin"], DOUYIN_DOMAINS,
+    source("douyin-series", "抖音短剧", ["douyin_abogus", "douyin"], DOUYIN_DOMAINS,
            BASIC + ["creator", "comments"], family="douyin", kind="drama", version="0.1.5",
+           credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DOMAINS),
+    source("douyin-theater", "抖音放映厅", ["douyin_abogus", "douyin"], DOUYIN_DOMAINS,
+           BASIC + ["creator", "comments"], family="douyin", kind="drama", version="0.1.6",
            credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DOMAINS),
     source("bilibili", "Bilibili 视频", ["bilibili"], ["api.bilibili.com"],
            BASIC + ["creator", "comments", "account", "search", "danmaku"], kind="video", version="0.2.1",
@@ -90,7 +90,7 @@ def main():
     ]
     for identifier, name, members in groups:
         base = dict(packages[members[0]])
-        bundle_version = {"douyin": "0.2.7", "bilibili": "0.3.2"}.get(identifier, "0.2.0")
+        bundle_version = {"douyin": "0.2.8", "bilibili": "0.3.2"}.get(identifier, "0.2.0")
         base.update(id=identifier, name=name, api=2, version=bundle_version,
                     description="组合订阅，子项独立开关；需要支持组合订阅的客户端",
                     domains=sorted({host for key in members for host in packages[key]["domains"]}),
