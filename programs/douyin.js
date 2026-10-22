@@ -56,9 +56,31 @@ function* sourceExecute(action,input,state){var source=input.source,drama=input.
  }
  if(action==='comments'){var response=yield* dyRequest('/aweme/v1/web/comment/list/',{aweme_id:id,cursor:input.cursor||'0',count:'20',item_type:'0'},{referer:'https://www.douyin.com/video/'+id});if(!Array.isArray(response.comments))throw new Error('评论列表未返回');var emojiAge=Date.now()-Number(state.commentEmojisAt||0),emojis=Array.isArray(state.commentEmojis)?state.commentEmojis:[],emojiCacheFresh=emojis.length?emojiAge<86400000:emojiAge<300000;if(!emojiCacheFresh){try{var emojiResponse=yield* dyRequest('/aweme/v1/web/emoji/list/',{},{referer:'https://www.douyin.com/video/'+id}),emojiRows=emojiResponse.emoji_list||emojiResponse.data&&emojiResponse.data.emoji_list||[];emojis=Array.isArray(emojiRows)?emojiRows.slice(0,300).map(function(row){var name=String(row.display_name||row.name||''),image=url(row.emoji_url||row.url);if(!name||!image)return null;if(name.charAt(0)!=='[')name='['+name+']';return {name:name,url:image};}).filter(Boolean):[];state.commentEmojis=emojis;state.commentEmojisAt=Date.now();}catch(error){state.commentEmojis=[];state.commentEmojisAt=Date.now();emojis=[];}}return {items:response.comments.slice(0,20).map(function(row){var user=row.user||{};return {id:String(row.cid||''),author:String(user.nickname||'抖音用户'),avatar:url(user.avatar_thumb||user.avatar_medium),text:String(row.text||''),likes:Number(row.digg_count)||0};}),emojis:emojis,cursor:String(response.cursor||'0'),hasMore:yes(response.has_more)&&String(response.cursor)!==String(input.cursor||'0'),total:Number(response.total)||0};}
  if(action==='creator'){
-  if(['douyin','douyin-test','douyin-theater','douyin-theater-test'].indexOf(input.videoSource)<0)throw new Error('请先导入并开启抖音短视频或放映厅，以播放作者作品');
-  if(!drama.creatorSecUid){if(douyinLive)drama=dyRoomDrama(yield* dyReadRoom(id),id,source);else{var detail=yield* dyRequest('/aweme/v1/web/aweme/detail/',{aweme_id:id});drama=dyDrama(detail.aweme_detail||{},source);}}if(!drama.creatorSecUid)throw new Error('未取得作者主页标识');var cursor=input.cursor||'0',user={};if(cursor==='0'){try{var profile=yield* dyRequest('/aweme/v1/web/user/profile/other/',{sec_user_id:drama.creatorSecUid});user=profile.user||{};}catch(error){}}
-  var response=yield* dyRequest('/aweme/v1/web/aweme/post/',{sec_user_id:drama.creatorSecUid,max_cursor:cursor,count:'18',locate_query:'false',show_live_replay_strategy:'1',need_time_list:'0',time_list_query:'0',whale_cut_token:''});if(!Array.isArray(response.aweme_list))throw new Error('作者作品列表未返回');if(!Object.keys(user).length)user=response.user_info||response.user||{};var items=response.aweme_list.filter(function(row){return row.aweme_id&&dyVariants(row).length;}).map(function(row){dyRemember(state,row);return dyDrama(row,input.videoSource);});return {items:items,name:String(user.nickname||drama.creatorName||''),avatar:url(user.avatar_thumb||user.avatar_medium)||drama.creatorAvatar,userId:String(user.unique_id||user.short_id||drama.creatorId||''),bio:String(user.signature||''),likes:user.total_favorited,following:user.following_count,followers:user.follower_count,cursor:String(response.max_cursor||cursor),hasMore:yes(response.has_more)};
+  var videoSource=input.videoSource||source;
+  if(['douyin','douyin-test','douyin-theater','douyin-theater-test'].indexOf(videoSource)<0)videoSource=douyinTheater?'douyin-theater':'douyin';
+  var secUid=drama.creatorSecUid;
+  if(!secUid){
+   var cachedRow=state.rows&&state.rows[id];
+   if(cachedRow&&cachedRow.author&&cachedRow.author.sec_uid)secUid=String(cachedRow.author.sec_uid);
+  }
+  if(!secUid){
+   if(douyinLive){drama=dyRoomDrama(yield* dyReadRoom(id),id,source);secUid=drama.creatorSecUid;}
+   else{
+    var detail=yield* dyRequest('/aweme/v1/web/aweme/detail/',{aweme_id:id},{referer:'https://www.douyin.com/video/'+id});
+    var row=detail.aweme_detail||{};
+    if(row.aweme_id)dyRemember(state,row);
+    drama=dyDrama(row,source);
+    secUid=drama.creatorSecUid;
+   }
+  }
+  if(!secUid)throw new Error('未取得作者主页标识');
+  var cursor=input.cursor||'0',userReferer='https://www.douyin.com/user/'+secUid;
+  var response=yield* dyRequest('/aweme/v1/web/aweme/post/',{sec_user_id:secUid,max_cursor:cursor,count:'18',locate_query:'false',show_live_replay_strategy:'1',need_time_list:'0',time_list_query:'0',whale_cut_token:''},{referer:userReferer});
+  var postList=Array.isArray(response.aweme_list)?response.aweme_list:[];
+  if(!Array.isArray(response.aweme_list)&&response.status_code&&response.status_code!==0)throw new Error('作者作品列表未返回');
+  var user=response.user_info||response.user||{};
+  var items=postList.filter(function(row){return row.aweme_id&&dyVariants(row).length;}).map(function(row){dyRemember(state,row);return dyDrama(row,videoSource);});
+  return {items:items,name:String(user.nickname||drama.creatorName||''),avatar:url(user.avatar_thumb||user.avatar_medium)||drama.creatorAvatar,userId:String(user.unique_id||user.short_id||drama.creatorId||''),bio:String(user.signature||''),likes:user.total_favorited,following:user.following_count,followers:user.follower_count,cursor:String(response.max_cursor||cursor),hasMore:yes(response.has_more)&&String(response.max_cursor||'')!==cursor};
  }
  if(douyinLive&&(action==='detail'||action==='resolve'||action==='live')){var room=yield* dyReadRoom(id),item=dyRoomDrama(room,id,source);if(action==='detail')return single(item);var plan=dyLivePlan(room,id,Number(input.quality)||0);return action==='live'?{drama:item,plan:plan}:plan;}
  if(douyinSeries&&action==='detail'){
@@ -72,7 +94,24 @@ function* sourceExecute(action,input,state){var source=input.source,drama=input.
   var chapter=input.chapter||{};if(chapter.vip)throw new Error('\u6b64\u5206\u96c6\u9700\u8981\u5728\u5b98\u65b9\u5ba2\u6237\u7aef\u67e5\u770b');var episodeId=String(chapter.id||theater.episodeId),response=yield* dyRequest('/aweme/v1/web/long/video/detail/',{episode_id:episodeId},{referer:referer}),detail=response.aweme_detail||{};if(!detail.video)throw new Error('\u653e\u6620\u5385\u5355\u96c6\u8be6\u60c5\u672a\u8fd4\u56de');var choices=dyVariants(detail);if(!choices.length){var model=detail.video.video_model;try{if(typeof model==='string')model=JSON.parse(model);}catch(error){model=null;}var streams=array((model||{}).dynamic_video&&model.dynamic_video.dynamic_video_list),encrypted=streams.some(function(stream){var info=stream.encrypt_info||{};return yes(info.encrypt)||String(info.encryption_method||'').toLowerCase()==='cenc-aes-ctr';});if(encrypted)throw new Error('\u6296\u97f3\u653e\u6620\u5385\u89c6\u9891\u4f7f\u7528 CENC DRM \u6388\u6743\u6d41\uff0c\u5f53\u524d\u64ad\u653e\u5668\u4e0d\u652f\u6301');throw new Error('\u6296\u97f3\u653e\u6620\u5385\u672a\u8fd4\u56de\u5f53\u524d\u64ad\u653e\u5668\u652f\u6301\u7684\u64ad\u653e\u5730\u5740');}choices.forEach(function(choice){choice.headers={'User-Agent':DY_UA,'Referer':referer};});return select(choices,Number(input.quality)||0);
  }
  if(action==='detail'||action==='resolve'){
-  var chapter=input.chapter||{};if(chapter.vip)throw new Error('此分集需要在官方客户端查看');var videoId=douyinSeries?String(chapter.id||''):id,row=state.rows&&state.rows[videoId];if(!row||input.force||Date.now()-Number(row.storedAt||0)>300000){var response=yield* dyRequest('/aweme/v1/web/aweme/detail/',{aweme_id:videoId});row=response.aweme_detail;if(!row||String(row.aweme_id)!==videoId)throw new Error('视频暂不可用或已删除');dyRemember(state,row);}var choices=dyVariants(row);if(!choices.length)throw new Error('视频未返回包含音轨的播放地址');if(action==='detail')return single(dyDrama(row,source,drama.category));choices.forEach(function(choice){choice.headers={'User-Agent':DY_UA,'Referer':'https://www.douyin.com/'};});return select(choices,Number(input.quality)||0);
+  var chapter=input.chapter||{};if(chapter.vip)throw new Error('此分集需要在官方客户端查看');var videoId=douyinSeries?String(chapter.id||''):id;
+  if(action==='detail'&&(douyinVideo||drama.episodes===1)&&!input.force){
+   var cached=state.rows&&state.rows[videoId];
+   if(cached)return single(dyDrama(cached,source,drama.category));
+   if(drama.sourceId)return single(drama);
+  }
+  var row=state.rows&&state.rows[videoId];
+  if(!row||input.force||Date.now()-Number(row.storedAt||0)>1800000){
+   var response=yield* dyRequest('/aweme/v1/web/aweme/detail/',{aweme_id:videoId},{referer:'https://www.douyin.com/video/'+videoId});
+   row=response.aweme_detail;
+   if(!row||String(row.aweme_id)!==videoId)throw new Error('视频暂不可用或已删除');
+   dyRemember(state,row);
+  }
+  var choices=dyVariants(row);
+  if(!choices.length)throw new Error('视频未返回包含音轨的播放地址');
+  if(action==='detail')return single(dyDrama(row,source,drama.category));
+  choices.forEach(function(choice){choice.headers={'User-Agent':DY_UA,'Referer':'https://www.douyin.com/'};});
+  return select(choices,Number(input.quality)||0);
  }
  return {error:'当前订阅不支持该操作'};
 }
