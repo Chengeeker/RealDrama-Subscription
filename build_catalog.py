@@ -17,7 +17,7 @@ SOURCES = [
     source("hongguo", "红果", ["hongguo", "hongguo-web"],
            ["api5-normal-sinfonlineb.fqnovel.com", "hongguoduanju.com", "djapi.999888456.xyz"],
            BASIC + ["search", "suggestions", "rankings", "download", "catalogTools"],
-           description="真人剧、漫剧、AI 剧；App、网页及备用公开播放接口", version="0.1.1"),
+           description="真人剧、漫剧、AI 剧；App、网页及备用公开播放接口", version="0.1.2"),
     source("douyin", "抖音短视频", ["douyin"], DOUYIN_DANMAKU_DOMAINS,
            BASIC + ["creator", "comments", "danmaku"], family="douyin", kind="video", version="0.1.2",
            credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DANMAKU_DOMAINS),
