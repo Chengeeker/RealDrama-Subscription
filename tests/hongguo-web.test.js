@@ -44,29 +44,45 @@ for (const [category, slug] of [["short_play", "real-drama"], ["comic_series", "
 }
 console.log("hongguo catalog fallback request checks passed");
 
-function resolvePublic(metadata) {
+function resolveWeb(overrides = {}) {
   const generator = context.sourceExecute("resolve", {
     drama: {sourceId: "123456"}, chapter: {videoId: "654321"},
   }, {});
   assert.strictEqual(generator.next().value.url, "https://hongguoduanju.com/player/123456/654321");
-  return generator.next({status: 200, text: body({
+  const step = generator.next({status: 200, text: body({
     player_layout: null,
     "player_(series_id)/(vid)/layout": null,
-    "player_(series_id)/(vid)/page": {series_id: "123456", vid: "654321", publicVideoSeo: metadata},
+    "player_(series_id)/(vid)/page": {
+      series_id: "123456", vid: "654321",
+      publicVideoSeo: {available: true, seriesId: "123456", itemId: "654321"},
+      ...overrides,
+    },
   })});
+  return {generator, step};
 }
-const publicMetadata = {available: true, seriesId: "123456", itemId: "654321"};
-const resolved = resolvePublic(publicMetadata);
+const flow = resolveWeb();
+assert.strictEqual(flow.step.done, false);
+assert.strictEqual(flow.step.value.url, "https://hongguoduanju.com/api/video/protected/fallback-play-info");
+assert.strictEqual(flow.step.value.method, "POST");
+assert.strictEqual(JSON.parse(flow.step.value.body).item_id, "654321");
+const resolved = flow.generator.next({status: 200, text: JSON.stringify({
+  main_url: "https://media.example/full-episode.mp4", base_resp: {StatusCode: 0},
+})});
 assert.strictEqual(resolved.done, true);
-assert.strictEqual(resolved.value.url, "https://hongguoduanju.com/video/public/654321/360p.mp4");
-assert.strictEqual(resolved.value.quality, 360);
-for (const metadata of [
-  {...publicMetadata, available: false},
-  {...publicMetadata, seriesId: "999"},
-  {...publicMetadata, itemId: "999"},
+assert.strictEqual(resolved.value.url, "https://media.example/full-episode.mp4");
+
+for (const response of [
+  {status: 403, text: '{"error":"public_fallback_unavailable"}'},
+  {status: 200, text: '{"main_url":"https://media.example/rejected.mp4","base_resp":{"StatusCode":1}}'},
 ]) {
-  const fallback = resolvePublic(metadata);
+  const rejected = resolveWeb();
+  const fallback = rejected.generator.next(response);
   assert.strictEqual(fallback.done, false);
   assert.ok(fallback.value.url.startsWith("https://djapi.999888456.xyz/api/hongguo/play?"));
+  assert.throws(() => rejected.generator.next({status: 403, text: ""}),
+    (error) => error.sourceError === "http" && error.httpStatus === 403);
 }
-console.log("hongguo public playback identity checks passed");
+const legacy = resolveWeb({video_player_info: {main_url: "https://media.example/existing.mp4"}});
+assert.strictEqual(legacy.step.done, true);
+assert.strictEqual(legacy.step.value.url, "https://media.example/existing.mp4");
+console.log("hongguo full playback and preview rejection checks passed");
