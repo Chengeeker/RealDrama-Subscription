@@ -38,7 +38,7 @@
       "api": 2,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.2.6",
+      "version": "0.2.7",
       "credentialDomains": [
         "www.douyin.com",
         "live.douyin.com",
@@ -172,7 +172,7 @@
         }
       ],
       "url": "sources/douyin.json",
-      "sha256": "b59589a960c7726959f8dcc6d5785052b405f425b2a753702ebbd0e00bf1f605"
+      "sha256": "c72bec6c6c0f81232207c467b6990ae0f07a8f0f2823e844ebe34c7b3f9c7a2f"
     },
     {
       "schema": 1,

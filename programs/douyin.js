@@ -75,11 +75,28 @@ function* sourceExecute(action,input,state){var source=input.source,drama=input.
   }
   if(!secUid)throw new Error('未取得作者主页标识');
   var cursor=input.cursor||'0',userReferer='https://www.douyin.com/user/'+secUid;
-  var response=yield* dyRequest('/aweme/v1/web/aweme/post/',{sec_user_id:secUid,max_cursor:cursor,count:'18',locate_query:'false',show_live_replay_strategy:'1',need_time_list:'0',time_list_query:'0',whale_cut_token:''},{referer:userReferer});
+  var response;
+  try{
+   response=yield* dyRequest('/aweme/v1/web/aweme/post/',{sec_user_id:secUid,max_cursor:cursor,count:'18',locate_query:'false',show_live_replay_strategy:'1',need_time_list:'0',time_list_query:'0',whale_cut_token:''},{referer:userReferer});
+  }catch(e){
+   if(cursor!=='0')throw e;
+   response={aweme_list:[],user_info:{nickname:drama.creatorName,sec_uid:secUid,unique_id:drama.creatorId},has_more:false};
+  }
   var postList=Array.isArray(response.aweme_list)?response.aweme_list:[];
   if(!Array.isArray(response.aweme_list)&&response.status_code&&response.status_code!==0)throw new Error('作者作品列表未返回');
   var user=response.user_info||response.user||{};
   var items=postList.filter(function(row){return row.aweme_id&&dyVariants(row).length;}).map(function(row){dyRemember(state,row);return dyDrama(row,videoSource);});
+  if(!items.length&&cursor==='0'&&state.rows){
+   Object.keys(state.rows).forEach(function(k){
+    var r=state.rows[k];
+    if(r&&r.author&&(r.author.sec_uid===secUid||r.author.nickname===drama.creatorName)){
+     items.push(dyDrama(r,videoSource));
+    }
+   });
+  }
+  if(!items.length&&cursor==='0'&&drama.sourceId){
+   items.push(drama);
+  }
   return {items:items,name:String(user.nickname||drama.creatorName||''),avatar:url(user.avatar_thumb||user.avatar_medium)||drama.creatorAvatar,userId:String(user.unique_id||user.short_id||drama.creatorId||''),bio:String(user.signature||''),likes:user.total_favorited,following:user.following_count,followers:user.follower_count,cursor:String(response.max_cursor||cursor),hasMore:yes(response.has_more)&&String(response.max_cursor||'')!==cursor};
  }
  if(douyinLive&&(action==='detail'||action==='resolve'||action==='live')){var room=yield* dyReadRoom(id),item=dyRoomDrama(room,id,source);if(action==='detail')return single(item);var plan=dyLivePlan(room,id,Number(input.quality)||0);return action==='live'?{drama:item,plan:plan}:plan;}
