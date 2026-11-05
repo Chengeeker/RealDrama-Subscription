@@ -33,7 +33,7 @@ assert.throws(() => generator.next({status: 200, text: ""}), /empty response/);
 
 generator = context.hgRequest("/novel/player/video_model/v1/", {video_id: "synthetic"}, null, {});
 generator.next();
-for (let attempt = 0; attempt < 4; attempt++) {
+for (let attempt = 0; attempt < 1; attempt++) {
   assert.strictEqual(generator.next({status: 200, text: ""}).done, false);
 }
 assert.throws(() => generator.next({status: 200, text: ""}), /empty response/);

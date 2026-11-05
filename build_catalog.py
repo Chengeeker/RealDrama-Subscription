@@ -15,9 +15,9 @@ DOUYIN_DOMAINS = ["www.douyin.com", "live.douyin.com"]
 DOUYIN_DANMAKU_DOMAINS = DOUYIN_DOMAINS + ["www-hj.douyin.com"]
 SOURCES = [
     source("hongguo", "红果", ["hongguo", "hongguo-web"],
-           ["api5-normal-sinfonlineb.fqnovel.com", "hongguoduanju.com", "djapi.999888456.xyz"],
+           ["api5-normal-sinfonlineb.fqnovel.com", "api5-normal-hl.fqnovel.com", "vas-lf-x.snssdk.com", "log5-applog-lf.fqnovel.com", "hongguoduanju.com", "djapi.999888456.xyz"],
            BASIC + ["search", "suggestions", "rankings", "download", "catalogTools"],
-           description="真人剧、漫剧、AI 剧；App、网页及备用公开播放接口", version="0.1.4"),
+           description="真人剧、漫剧、AI 剧；App、网页及备用公开播放接口", version="0.1.5"),
     source("douyin", "抖音短视频", ["douyin"], DOUYIN_DANMAKU_DOMAINS,
            BASIC + ["creator", "comments", "danmaku"], family="douyin", kind="video", version="0.1.6",
            credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DANMAKU_DOMAINS),
