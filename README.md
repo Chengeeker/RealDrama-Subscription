@@ -33,6 +33,8 @@ py -3 build_catalog.py
 - 单包与组合包通过 `schema`、`api` 和 `engine` 声明数据格式及运行接口；组合包使用 `children` 描述子项。
 - 程序入口为 `sourceExecute(action, input, state)`。网络请求以受限请求描述交给客户端原生网络层执行。
 - 包通过 `capabilities` 声明可执行的操作，通过 `domains` 与 `credentialDomains` 限定普通请求和凭据请求的目标域名。
+- 从客户端 2.2.0（4262）起，`capabilities` 中的 `feedSeek` 可为点播剧集开启首页进度拖动。普通视频延续可拖动的默认行为，直播按原有控制方式播放。
+- 提供 `danmaku` 的子源可用整数 `danmakuWindowMs` 声明与订阅程序一致的弹幕分段时长，单位为毫秒。客户端 2.2.0 支持 1000 至 600000 毫秒，并兼容旧包的默认分段。
 - 可选 `browserCredentialDomains` 必须是 `credentialDomains` 的子集，并且仅在 `browser: true` 时生效；客户端只在列出的域名上将订阅凭据与浏览器兼容请求配合使用，每个来源隔离自己的 Cookie 会话。使用此能力的订阅要求客户端 `1.1.4+2224` 或更新版本。
 - 程序运行在客户端受限环境中，不直接访问本地文件、网络套接字或凭据存储。新协议能力需要客户端版本支持。
 

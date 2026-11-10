@@ -16,22 +16,22 @@ DOUYIN_DANMAKU_DOMAINS = DOUYIN_DOMAINS + ["www-hj.douyin.com"]
 SOURCES = [
     source("hongguo", "红果", ["hongguo", "hongguo-web"],
            ["api5-normal-sinfonlineb.fqnovel.com", "api5-normal-hl.fqnovel.com", "vas-lf-x.snssdk.com", "log5-applog-lf.fqnovel.com", "hongguoduanju.com", "djapi.999888456.xyz"],
-           BASIC + ["search", "suggestions", "rankings", "download", "catalogTools"],
-           description="真人剧、漫剧、AI 剧；App、网页及备用公开播放接口", version="0.1.5"),
+           BASIC + ["search", "suggestions", "rankings", "download", "catalogTools", "feedSeek"],
+           description="真人剧、漫剧、AI 剧；App、网页及备用公开播放接口", version="0.1.6"),
     source("douyin", "抖音短视频", ["douyin"], DOUYIN_DANMAKU_DOMAINS,
-           BASIC + ["creator", "comments", "danmaku"], family="douyin", kind="video", version="0.1.6",
+           BASIC + ["creator", "comments", "danmaku"], family="douyin", kind="video", danmakuWindowMs=32000, version="0.1.7",
            credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DANMAKU_DOMAINS),
     source("douyin-live", "抖音直播", ["douyin"], DOUYIN_DOMAINS,
            BASIC + ["creator", "live"], family="douyin", kind="live", version="0.1.6",
            credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DOMAINS),
     source("douyin-series", "抖音短剧", ["douyin"], DOUYIN_DOMAINS,
-           BASIC + ["creator", "comments"], family="douyin", kind="drama", version="0.1.6",
+           BASIC + ["creator", "comments", "feedSeek"], family="douyin", kind="drama", version="0.1.7",
            credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DOMAINS),
     source("douyin-theater", "抖音放映厅", ["douyin"], DOUYIN_DOMAINS,
-           BASIC + ["creator", "comments"], family="douyin", kind="drama", version="0.1.7",
+           BASIC + ["creator", "comments", "feedSeek"], family="douyin", kind="drama", version="0.1.8",
            credentialGroup="douyin", credentialRequired=True, credentialDomains=DOUYIN_DOMAINS),
     source("bilibili", "Bilibili 视频", ["bilibili"], ["api.bilibili.com"],
-           BASIC + ["creator", "comments", "account", "search", "danmaku"], kind="video", version="0.2.1",
+           BASIC + ["creator", "comments", "account", "search", "danmaku"], kind="video", danmakuWindowMs=360000, version="0.2.2",
            credentialGroup="bilibili", credentialDomains=["api.bilibili.com"]),
     source("bilibili-live", "Bilibili 直播", ["bilibili-live"],
            ["api.bilibili.com", "api.live.bilibili.com", "live.bilibili.com"],
@@ -40,24 +40,24 @@ SOURCES = [
            credentialDomains=["api.live.bilibili.com"],
            description="公开直播推荐、关注和分区；关注列表可选 Cookie 登录"),
 
-    source("hanxiaoquan", "韩小圈", ["web-cms"], ["www.jennyhow.com"], BASIC + ["search", "download"],
+    source("hanxiaoquan", "韩小圈", ["web-cms"], ["www.jennyhow.com"], BASIC + ["search", "download", "feedSeek"], version="0.1.1",
            config=dict(id="hanxiaoquan", base="https://www.jennyhow.com", categories=[
                dict(id=str(n), name=name) for n, name in [(1,"韩剧"),(2,"电影"),(3,"综艺"),(4,"动漫")]])),
-    source("guipian", "鬼片", ["web-cms"], ["guipianwu.com"], BASIC + ["search", "download"],
+    source("guipian", "鬼片", ["web-cms"], ["guipianwu.com"], BASIC + ["search", "download", "feedSeek"], version="0.1.1",
            config=dict(id="guipian", base="https://guipianwu.com", categories=[
                dict(id=str(n), name=name) for n, name in [(3,"恐怖片"),(6,"大陆鬼片"),(7,"日韩鬼片"),(8,"林正英鬼片"),(9,"港台鬼片"),(10,"泰国鬼片"),(11,"欧美鬼片"),(31,"剧情片"),(12,"国产剧"),(13,"美剧"),(14,"韩剧"),(15,"日剧"),(16,"泰剧"),(17,"港台剧"),(18,"其他剧"),(23,"日韩动漫"),(24,"国产动漫"),(25,"欧美动漫"),(26,"港台动漫")]])),
-    source("sorani", "青空", ["sorani"], ["api.sorani.cc"], BASIC + ["search", "download"]),
-    source("huangju", "剧果", ["huangju"], ["api.huangju.net"], BASIC + ["search", "download"]),
-    source("dsd", "帝果", ["dsd"], ["www.dsd.com.se"], BASIC + ["search", "download"]),
-    source("crj91", "91成人短剧", ["crj91"], ["91crdjai.com"], BASIC + ["search", "download"], version="0.1.2"),
+    source("sorani", "青空", ["sorani"], ["api.sorani.cc"], BASIC + ["search", "download", "feedSeek"], version="0.1.1"),
+    source("huangju", "剧果", ["huangju"], ["api.huangju.net"], BASIC + ["search", "download", "feedSeek"], version="0.1.1"),
+    source("dsd", "帝果", ["dsd"], ["www.dsd.com.se"], BASIC + ["search", "download", "feedSeek"], version="0.1.1"),
+    source("crj91", "91成人短剧", ["crj91"], ["91crdjai.com"], BASIC + ["search", "download", "feedSeek"], version="0.1.3"),
     source("stripchat", "Stripchat 成人直播", ["stripchat"], ["zh.stripchat.global", "zh.stripol.com", "zh.stripchat.com",
            "edge-hls.doppiocdn.org", "edge-hls.doppiocdn.media", "edge-hls.growcdnssedge.com", "edge-hls.sacfedge.com"],
            BASIC + ["search", "playlistRewrite"], kind="live", version="0.1.1"),
-    source("huangguoai", "黄果 AI", ["huangguo"], ["huangguoai.com"], BASIC + ["download"], family="huangguo"),
-    source("huangguo-video", "黄果视频", ["huangguo"], ["huangguo.video"], BASIC + ["download"], family="huangguo", browser=True),
+    source("huangguoai", "黄果 AI", ["huangguo"], ["huangguoai.com"], BASIC + ["download", "feedSeek"], version="0.1.1", family="huangguo"),
+    source("huangguo-video", "黄果视频", ["huangguo"], ["huangguo.video"], BASIC + ["download", "feedSeek"], version="0.1.1", family="huangguo", browser=True),
     source("cloudfront", "黄果旧版", ["cloudfront"], ["d2pypzndaqisk.cloudfront.net", "dr6skssi3nxbk.cloudfront.net",
            "d18ka9rqpfd3lo.cloudfront.net", "d37n0wjehmw08f.cloudfront.net", "sjljsla.lkkwip.cn"],
-           BASIC + ["download"], family="huangguo"),
+           BASIC + ["download", "feedSeek"], version="0.1.1", family="huangguo"),
 ]
 
 def main():
@@ -90,7 +90,8 @@ def main():
     ]
     for identifier, name, members in groups:
         base = dict(packages[members[0]])
-        bundle_version = {"douyin": "0.2.9", "bilibili": "0.3.2"}.get(identifier, "0.2.0")
+        base.pop("danmakuWindowMs", None)
+        bundle_version = {"douyin": "0.2.10", "bilibili": "0.3.3", "huangguo": "0.2.1"}[identifier]
         base.update(id=identifier, name=name, api=2, version=bundle_version,
                     description="组合订阅，子项独立开关；需要支持组合订阅的客户端",
                     domains=sorted({host for key in members for host in packages[key]["domains"]}),

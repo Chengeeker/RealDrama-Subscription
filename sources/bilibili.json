@@ -3,7 +3,7 @@
   "api": 2,
   "status": "draft",
   "engine": "javascript-generator-v1",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "credentialDomains": [
     "api.bilibili.com"
   ],
@@ -53,6 +53,7 @@
         "danmaku"
       ],
       "kind": "video",
+      "danmakuWindowMs": 360000,
       "credentialGroup": "bilibili"
     },
     {

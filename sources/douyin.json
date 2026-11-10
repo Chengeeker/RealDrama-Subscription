@@ -3,7 +3,7 @@
   "api": 2,
   "status": "draft",
   "engine": "javascript-generator-v1",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "credentialDomains": [
     "www.douyin.com",
     "live.douyin.com",
@@ -24,6 +24,7 @@
     "creator",
     "danmaku",
     "detail",
+    "feedSeek",
     "live",
     "resolve"
   ],
@@ -58,6 +59,7 @@
       ],
       "family": "douyin",
       "kind": "video",
+      "danmakuWindowMs": 32000,
       "credentialGroup": "douyin",
       "credentialRequired": true
     },
@@ -104,7 +106,8 @@
         "detail",
         "resolve",
         "creator",
-        "comments"
+        "comments",
+        "feedSeek"
       ],
       "family": "douyin",
       "kind": "drama",
@@ -129,7 +132,8 @@
         "detail",
         "resolve",
         "creator",
-        "comments"
+        "comments",
+        "feedSeek"
       ],
       "family": "douyin",
       "kind": "drama",

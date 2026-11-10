@@ -3,7 +3,7 @@
   "api": 1,
   "status": "draft",
   "engine": "javascript-generator-v1",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "credentialDomains": [
     "www.douyin.com",
     "live.douyin.com"
@@ -21,7 +21,8 @@
     "detail",
     "resolve",
     "creator",
-    "comments"
+    "comments",
+    "feedSeek"
   ],
   "family": "douyin",
   "kind": "drama",

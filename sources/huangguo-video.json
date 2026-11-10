@@ -3,7 +3,7 @@
   "api": 1,
   "status": "draft",
   "engine": "javascript-generator-v1",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "credentialDomains": [],
   "description": "可独立更新的本地站源程序",
   "id": "huangguo-video",
@@ -16,7 +16,8 @@
     "categories",
     "detail",
     "resolve",
-    "download"
+    "download",
+    "feedSeek"
   ],
   "family": "huangguo",
   "browser": true,

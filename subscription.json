@@ -9,7 +9,7 @@
       "api": 1,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.1.5",
+      "version": "0.1.6",
       "credentialDomains": [],
       "description": "真人剧、漫剧、AI 剧；App、网页及备用公开播放接口",
       "id": "hongguo",
@@ -31,17 +31,18 @@
         "suggestions",
         "rankings",
         "download",
-        "catalogTools"
+        "catalogTools",
+        "feedSeek"
       ],
       "url": "sources/hongguo.json",
-      "sha256": "ea22c9c04839e4e63959841ee8e65cb51ac4e6d53e07d91e0b7e65c87cbc0591"
+      "sha256": "ae509d9a94d84d5caf3368b794e7ca23b292709f6780bafc240a8990d3adc845"
     },
     {
       "schema": 1,
       "api": 2,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.2.9",
+      "version": "0.2.10",
       "credentialDomains": [
         "www.douyin.com",
         "live.douyin.com",
@@ -62,6 +63,7 @@
         "creator",
         "danmaku",
         "detail",
+        "feedSeek",
         "live",
         "resolve"
       ],
@@ -95,6 +97,7 @@
           ],
           "family": "douyin",
           "kind": "video",
+          "danmakuWindowMs": 32000,
           "credentialGroup": "douyin",
           "credentialRequired": true
         },
@@ -141,7 +144,8 @@
             "detail",
             "resolve",
             "creator",
-            "comments"
+            "comments",
+            "feedSeek"
           ],
           "family": "douyin",
           "kind": "drama",
@@ -166,7 +170,8 @@
             "detail",
             "resolve",
             "creator",
-            "comments"
+            "comments",
+            "feedSeek"
           ],
           "family": "douyin",
           "kind": "drama",
@@ -175,14 +180,14 @@
         }
       ],
       "url": "sources/douyin.json",
-      "sha256": "98eef9a80e18bfcb6c900c343ee5f54ae21af288ee94e60951596657cdeee5f4"
+      "sha256": "c3894c3b29c703a9bc11091dbe59d42058c3b5168d6ed80e1912fc3f9db2900b"
     },
     {
       "schema": 1,
       "api": 2,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.3.2",
+      "version": "0.3.3",
       "credentialDomains": [
         "api.bilibili.com"
       ],
@@ -231,6 +236,7 @@
             "danmaku"
           ],
           "kind": "video",
+          "danmakuWindowMs": 360000,
           "credentialGroup": "bilibili"
         },
         {
@@ -259,14 +265,14 @@
         }
       ],
       "url": "sources/bilibili.json",
-      "sha256": "1a48cad5efbfed8558a3c6b0e30f7d08e62b1f1e7aaf79ef9e9ad9016ce7bd98"
+      "sha256": "840ef9cc9b2bfa073d984690a29b4413fffcd36615d59580aa37114e41e69ccc"
     },
     {
       "schema": 1,
       "api": 1,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "credentialDomains": [],
       "description": "可独立更新的本地站源程序",
       "id": "hanxiaoquan",
@@ -280,17 +286,18 @@
         "detail",
         "resolve",
         "search",
-        "download"
+        "download",
+        "feedSeek"
       ],
       "url": "sources/hanxiaoquan.json",
-      "sha256": "a4faec9bf5dc3089ef9c811d3a73e4339cfb531224587d28c70a7146d4ad6d35"
+      "sha256": "3344d35303464b93edf05098758fe34ede5dbcfae30d079fc7df8dc071eac7bd"
     },
     {
       "schema": 1,
       "api": 1,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "credentialDomains": [],
       "description": "可独立更新的本地站源程序",
       "id": "guipian",
@@ -304,17 +311,18 @@
         "detail",
         "resolve",
         "search",
-        "download"
+        "download",
+        "feedSeek"
       ],
       "url": "sources/guipian.json",
-      "sha256": "6a6a09e3d94e9e50cb0c662385560a30a3e4bd9bdf8772c61190721ee7e2afab"
+      "sha256": "badb31d9b0d86d27b6282eca577fac7c6cfa40e159c32a99c9012d967e3e6931"
     },
     {
       "schema": 1,
       "api": 1,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "credentialDomains": [],
       "description": "可独立更新的本地站源程序",
       "id": "sorani",
@@ -328,17 +336,18 @@
         "detail",
         "resolve",
         "search",
-        "download"
+        "download",
+        "feedSeek"
       ],
       "url": "sources/sorani.json",
-      "sha256": "c7319e515a2c144c8baebde5a8dad90a96ef635673dfd9d462822f4a92420528"
+      "sha256": "ea560c171279fc446cb8c47417ae2af168da1970b22e07dcfd44e621c504e507"
     },
     {
       "schema": 1,
       "api": 1,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "credentialDomains": [],
       "description": "可独立更新的本地站源程序",
       "id": "huangju",
@@ -352,17 +361,18 @@
         "detail",
         "resolve",
         "search",
-        "download"
+        "download",
+        "feedSeek"
       ],
       "url": "sources/huangju.json",
-      "sha256": "3723b33cc2bc9a73151e49d3229c4d975e670e3ccb8e864a75adcb54fb0674b1"
+      "sha256": "131960c0adfa67097e390f0118f41b13412873592f81bfc2154bdf05ceb22733"
     },
     {
       "schema": 1,
       "api": 1,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "credentialDomains": [],
       "description": "可独立更新的本地站源程序",
       "id": "dsd",
@@ -376,17 +386,18 @@
         "detail",
         "resolve",
         "search",
-        "download"
+        "download",
+        "feedSeek"
       ],
       "url": "sources/dsd.json",
-      "sha256": "f72a50b666e7131a71f7724640095a65ead9bf8601c819603d37e0b3a28502dd"
+      "sha256": "d8558ae204c9389da4ca56ee67a13f71a861bd74ecf8574fcfbffd81449bd443"
     },
     {
       "schema": 1,
       "api": 1,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.1.2",
+      "version": "0.1.3",
       "credentialDomains": [],
       "description": "可独立更新的本地站源程序",
       "id": "crj91",
@@ -400,10 +411,11 @@
         "detail",
         "resolve",
         "search",
-        "download"
+        "download",
+        "feedSeek"
       ],
       "url": "sources/crj91.json",
-      "sha256": "ae823d95d11632bf7c6d0febb34a93a2b512d152858499c65b6f0acb60f032ba"
+      "sha256": "4a1274eda74bf67a9c291377d4d06359ae354650dc07726d90f97b8d0e5cf75b"
     },
     {
       "schema": 1,
@@ -441,7 +453,7 @@
       "api": 2,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "credentialDomains": [],
       "description": "组合订阅，子项独立开关；需要支持组合订阅的客户端",
       "id": "huangguo",
@@ -460,6 +472,7 @@
         "categories",
         "detail",
         "download",
+        "feedSeek",
         "resolve"
       ],
       "family": "huangguo",
@@ -477,7 +490,8 @@
             "categories",
             "detail",
             "resolve",
-            "download"
+            "download",
+            "feedSeek"
           ],
           "family": "huangguo"
         },
@@ -494,7 +508,8 @@
             "categories",
             "detail",
             "resolve",
-            "download"
+            "download",
+            "feedSeek"
           ],
           "family": "huangguo",
           "browser": true
@@ -516,13 +531,14 @@
             "categories",
             "detail",
             "resolve",
-            "download"
+            "download",
+            "feedSeek"
           ],
           "family": "huangguo"
         }
       ],
       "url": "sources/huangguo.json",
-      "sha256": "d21efd01d03bc4381a50ddb4347f240d42d03897426c916e4f9f18dd5112d867"
+      "sha256": "d54b5f47cd2f0491ce79a57bdea4854a50eaee5706f5378f8e0c6d2f7c2fd42e"
     }
   ]
 }
