@@ -1,49 +1,71 @@
 # RealDrama Subscription
 
-这是 RealDrama 客户端使用的可独立更新订阅包仓库。本文仅说明目录、包格式、构建与兼容机制；实际条目以订阅目录及其校验结果为准。
+Independently updatable subscription packages for [RealDrama](https://github.com/Chengeeker/RealDrama).
 
-## 订阅地址
+## Usage
 
-- 订阅目录：[subscription.json](https://raw.githubusercontent.com/Chengeeker/RealDrama-Subscription/main/subscription.json)
-- 单个订阅包模板：`https://raw.githubusercontent.com/Chengeeker/RealDrama-Subscription/main/sources/<source-id>.json`
+1. Copy the [catalog URL](https://raw.githubusercontent.com/Chengeeker/RealDrama-Subscription/main/subscription.json).
+2. In RealDrama, open Settings > Source management > Subscriptions and updates, and import the URL.
+3. Select the packages you want to install, then open Enable and maintain under Source management to enable them.
+4. Use the subscription update controls to check for and install package updates. Updating a package does not require reinstalling the app.
 
-在客户端的“站源管理 → 站源订阅”中导入目录链接，可浏览并选择目录中的包；也可以按包路径直接导入单个 JSON。
+You can also import a single package using this URL pattern:
 
-## 仓库结构
-
-- `subscription.json`：订阅目录，记录包元数据、兼容协议、能力声明、状态、下载路径和 SHA-256。
-- `sources/*.json`：可独立导入和更新的订阅包；组合包可包含多个可分别启用的子项。
-- `programs/*.js`：订阅程序和共享 SDK。
-- `build_catalog.py`：读取程序与定义，生成订阅包及目录校验值。
-
-## 构建与更新
-
-需要 Python 3。在仓库根目录运行：
-
-```powershell
-py -3 build_catalog.py
+```text
+https://raw.githubusercontent.com/Chengeeker/RealDrama-Subscription/main/sources/<source-id>.json
 ```
 
-修改程序后重新生成目录和包，并递增对应包的版本号。目录和包中的 SHA-256 会随生成结果更新。稳定的包 ID 用于匹配客户端中的设置、资料和更新记录，发布后不应随意更改。
+Replace `<source-id>` with an ID from the catalog. Available entries and capabilities are defined by the catalog and the installed packages. Packages imported from local files do not participate in online update checks.
 
-新版播放模型和加密地址能力需要客户端 `1.1.15+2235` 或更新版本。旧客户端保留原有取址回退；更新订阅本身不会补齐客户端缺少的原生能力。搜索支持 JSON 分页，搜索与详情成功结果最多缓存 60 秒、8 项；播放地址仅合并正在进行的同键请求，不长期缓存。
+### Optional account cookies
 
-## 运行协议
+Some subscriptions require account cookies. Only provide them in the corresponding subscription settings.
 
-- 单包与组合包通过 `schema`、`api` 和 `engine` 声明数据格式及运行接口；组合包使用 `children` 描述子项。
-- 程序入口为 `sourceExecute(action, input, state)`。网络请求以受限请求描述交给客户端原生网络层执行。
-- 包通过 `capabilities` 声明可执行的操作，通过 `domains` 与 `credentialDomains` 限定普通请求和凭据请求的目标域名。
-- 从客户端 2.2.0（4262）起，`capabilities` 中的 `feedSeek` 可为点播剧集开启首页进度拖动。普通视频延续可拖动的默认行为，直播按原有控制方式播放。
-- 提供 `danmaku` 的子源可用整数 `danmakuWindowMs` 声明与订阅程序一致的弹幕分段时长，单位为毫秒。客户端 2.2.0 支持 1000 至 600000 毫秒，并兼容旧包的默认分段。
-- 可选 `browserCredentialDomains` 必须是 `credentialDomains` 的子集，并且仅在 `browser: true` 时生效；客户端只在列出的域名上将订阅凭据与浏览器兼容请求配合使用，每个来源隔离自己的 Cookie 会话。使用此能力的订阅要求客户端 `1.1.4+2224` 或更新版本。
-- 程序运行在客户端受限环境中，不直接访问本地文件、网络套接字或凭据存储。新协议能力需要客户端版本支持。
+1. Sign in to the relevant website in Chrome.
+2. Open [Cookie-Editor](https://chromewebstore.google.com/detail/cookie-editor/hlkenndednhfkekhgcdicdfddnkalmdm) on that website. If cookies are missing, allow access to that site and reload the page.
+3. Export as **Header string**, usually `key1=value1; key2=value2`. Use JSON or Netscape format only if the subscription explicitly requires it.
+4. Paste the text into the subscription's Cookie field in RealDrama and save.
 
-## 完整性与安全
+Cookies are login credentials. Keep them on your device and out of repositories, issues, screenshots, and messages. Grant the extension only the site access it needs. Expired cookies or additional service checks can still prevent sign-in or playback.
 
-客户端会校验包的 SHA-256，并限制请求次数、执行时间和并发。摘要只能检查下载内容是否与目录记录一致，不能证明发布者身份；请只导入可信来源。客户端兼容性、账号授权、上游可用性和实际播放效果应分别验证。
+## Package maintenance
 
-Cookie、令牌、签名文件及个人配置不得提交到仓库。凭据由客户端安全存储，并仅按包声明和客户端策略使用。
+- `subscription.json`: catalog metadata, compatibility, capabilities, status, package paths, and SHA-256 hashes.
+- `sources/*.json`: individual packages; bundles can contain separately enabled child sources.
+- `programs/*.js`: subscription programs and the shared SDK.
+- `build_catalog.py`: generates packages and catalog hashes.
 
-## 状态说明
+With Python 3 installed, run from the repository root:
 
-订阅目录或包中的 `draft` 表示开发快照。通过生成、摘要或静态检查不等于已完成真实账号、上游接口和设备端验收。
+```sh
+python3 build_catalog.py
+```
+
+On Windows, use `py -3 build_catalog.py`.
+
+After changing a program, increment the affected package version and regenerate the packages and catalog together. Keep published package IDs stable so existing settings and update records continue to match.
+
+## Compatibility
+
+Updating subscriptions does not add missing native capabilities to an older client.
+
+- The extended playback model and encrypted URLs require client `1.1.15+2235` or later.
+- From client `2.2.0 (4262)`, `feedSeek` can enable feed seeking for on-demand episodes. Ordinary videos retain their default seeking behavior; live playback keeps its existing controls.
+- Sources providing `danmaku` may declare an integer `danmakuWindowMs` matching their program's segment duration. Client `2.2.0` accepts 1,000–600,000 milliseconds and retains the default for older packages.
+- `browserCredentialDomains` requires client `1.1.4+2224` or later. It must be a subset of `credentialDomains` and applies only to requests with `browser: true`. Cookie sessions remain isolated by source.
+
+## Runtime
+
+Packages declare their format and interface through `schema`, `api`, and `engine`; bundles list their sources in `children`. The program entry point is `sourceExecute(action, input, state)`.
+
+Programs describe requests for the client's restricted native network layer. `capabilities` declares supported operations; `domains` and `credentialDomains` limit ordinary and authenticated requests. Programs cannot directly access local files, network sockets, or credential storage.
+
+Search supports JSON pagination. Successful search and detail responses are cached for up to 60 seconds, with at most eight entries. Playback URL requests only share matching in-flight work and are not cached long-term.
+
+## Integrity and status
+
+The client verifies package SHA-256 hashes and limits request counts, execution time, and concurrency. A matching hash confirms agreement with the catalog, not the publisher's identity. Import only trusted subscriptions.
+
+Keep cookies, tokens, signing material, and personal configuration out of this repository. Credentials are stored by the client and used only within package declarations and client policy.
+
+A `draft` status indicates a development snapshot. Generation and static checks do not establish real-account access, service availability, device compatibility, or successful playback.
