@@ -40,6 +40,10 @@ SOURCES = [
            credentialDomains=["api.live.bilibili.com"],
            description="公开直播推荐、关注和分区；关注列表可选 Cookie 登录"),
 
+    source("tiktok", "TikTok beta", ["tiktok"], ["www.tikwm.com"],
+           BASIC + ["search", "download"], kind="video", version="0.2.3",
+           description="Public popular videos, search and playback via TikWM; no account login"),
+
     source("hanxiaoquan", "韩小圈", ["web-cms"], ["www.jennyhow.com"], BASIC + ["search", "download", "feedSeek"], version="0.1.1",
            config=dict(id="hanxiaoquan", base="https://www.jennyhow.com", categories=[
                dict(id=str(n), name=name) for n, name in [(1,"韩剧"),(2,"电影"),(3,"综艺"),(4,"动漫")]])),

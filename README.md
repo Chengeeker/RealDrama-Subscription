@@ -17,6 +17,14 @@ https://raw.githubusercontent.com/Chengeeker/RealDrama-Subscription/main/sources
 
 Replace `<source-id>` with an ID from the catalog. Available entries and capabilities are defined by the catalog and the installed packages. Packages imported from local files do not participate in online update checks.
 
+### TikTok beta
+
+[TikTok beta](https://raw.githubusercontent.com/Chengeeker/RealDrama-Subscription/main/sources/tiktok.json) provides public popular videos, keyword search, and video playback through TikWM without account login. Search also accepts numeric video IDs and full TikTok video URLs. Photo posts and ads are excluded.
+
+This is a beta package. Some videos can still fail during media DNS resolution, and availability depends on TikWM and the media service. It does not provide personalized recommendations, an account following feed, or comments.
+
+Import the online catalog or the package link to receive updates. If the existing TikTok package was imported from a local file or a different origin, remove that package before importing the online version. Keep the package ID `tiktok` for future updates; when a stable version is released, its display name will change to `TikTok`.
+
 ### Optional account cookies
 
 Some subscriptions require account cookies. Only provide them in the corresponding subscription settings.

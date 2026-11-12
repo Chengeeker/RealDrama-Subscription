@@ -272,6 +272,31 @@
       "api": 1,
       "status": "draft",
       "engine": "javascript-generator-v1",
+      "version": "0.2.3",
+      "credentialDomains": [],
+      "description": "Public popular videos, search and playback via TikWM; no account login",
+      "id": "tiktok",
+      "name": "TikTok beta",
+      "domains": [
+        "www.tikwm.com"
+      ],
+      "capabilities": [
+        "catalog",
+        "categories",
+        "detail",
+        "resolve",
+        "search",
+        "download"
+      ],
+      "kind": "video",
+      "url": "sources/tiktok.json",
+      "sha256": "8d5417a74481501b36cb255142b4533837f9445110a5b55941ada8eca2d44306"
+    },
+    {
+      "schema": 1,
+      "api": 1,
+      "status": "draft",
+      "engine": "javascript-generator-v1",
       "version": "0.1.1",
       "credentialDomains": [],
       "description": "可独立更新的本地站源程序",
