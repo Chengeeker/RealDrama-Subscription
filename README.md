@@ -19,7 +19,7 @@ Replace `<source-id>` with an ID from the catalog. Available entries and capabil
 
 ### Hongguo playback
 
-The Hongguo `0.1.7` development package retains a consistent device identity during retries and tries the second video-model API host when the first returns an empty HTTP 200 response. It is intended to reduce intermittent episode-resolution failures, not to bypass unavailable upstream content. Playback through the Android player still requires device verification.
+Hongguo `0.1.8` removes the persistent synthetic device identity introduced in `0.1.7` and adds one bounded retry using a fresh legitimate registration when the App video-model request intermittently fails. A rate limit is terminal, and an explicit access denial does not trigger another registration attempt. The official website's public playback endpoint may refuse later episodes with HTTP 403; this is a content-availability restriction, not proof of a defective episode URL. This change improves recovery from transient failures but does not claim to unlock or restore every episode. Android playback still requires device verification.
 
 ### TikTok beta
 

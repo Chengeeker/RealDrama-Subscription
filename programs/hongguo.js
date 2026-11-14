@@ -9,7 +9,7 @@ function hgDeviceID(){var value="1";for(var i=0;i<15;i++)value+=String(Math.floo
 function* hgRequest(route,payload,extra,state,identity){
  var attempts=route.indexOf("video_model")>=0?2:3;
  for(var attempt=0;attempt<attempts;attempt++){
-  var now=Date.now(),params={aid:"8662",app_name:"novelread",version_code:"73532",version_name:"7.3.5.32",manifest_version_code:"73532",update_version_code:"73532",channel:"update_64",device_platform:"android",os:"android",ssmix:"a",device_type:"25053RT47C",device_brand:"Redmi",language:"zh",os_api:"36",os_version:"16",resolution:"1280*2772",dpi:"520",ac:"wifi",device_id:(state.deviceId=state.deviceId||hgDeviceID()),iid:(state.installId=state.installId||hgDeviceID()),_rticket:String(now)};
+  var now=Date.now(),params={aid:"8662",app_name:"novelread",version_code:"73532",version_name:"7.3.5.32",manifest_version_code:"73532",update_version_code:"73532",channel:"update_64",device_platform:"android",os:"android",ssmix:"a",device_type:"25053RT47C",device_brand:"Redmi",language:"zh",os_api:"36",os_version:"16",resolution:"1280*2772",dpi:"520",ac:"wifi",device_id:(state.deviceId=hgDeviceID()),iid:(state.installId=hgDeviceID()),_rticket:String(now)};
   Object.assign(params,extra||{},identity||{});
   var q=query(params),body=payload?JSON.stringify(payload):null,signed=typeof hongguoSign==="function"?JSON.parse(hongguoSign(JSON.stringify(params),body||"",now)):{query:q,headers:hgSign(q,body,now)};
   var headers=Object.assign({"User-Agent":HG_UA,"Accept":"application/json","X-XS-From-Web":"0","Sdk-Version":"2","Content-Type":"application/json; charset=utf-8"},signed.headers);
@@ -94,13 +94,20 @@ function* hgResolve(input,state){
  if(!/^\d{1,30}$/.test(videoId))throw new Error('Invalid episode');
  var quality=Number(input.quality)||0;
  if(typeof hongguoRegisterRequest==='function'){
-  try{
-   var identity=yield* hgRegister();
-   Object.assign(identity,{version_code:"71332",version_name:"7.1.3.32",manifest_version_code:"71332",update_version_code:"71332",host_abi:"arm64-v8a",dragon_device_type:"phone",pv_player:"71332",compliance_status:"0",need_personal_recommend:"1",player_so_load:"1",is_android_pad_screen:"0",ts:String(Math.floor(Date.now()/1000))});
-   var modern=yield* hgRequest('/novel/player/multi_video_model/v1/',{mixed_video_id_map:{'1004':[videoId]},biz_param:{detail_page_version:0,device_level:3,disable_digg_stat:false,need_all_video_definition:true,need_mp4_align:false,use_os_player:false,use_server_dns:false,video_platform:1024}},null,state,identity);
-   if(!Object.prototype.hasOwnProperty.call(modern,videoId))throw new Error('Wrong episode model');
-   return select(yield* hgModelChoices(hgModel(modern[videoId].video_model)),quality);
-  }catch(error){if(error.httpStatus===429)throw error;}
+  // A fresh, legitimate registration can recover from intermittent empty video-model replies.
+  // Retry only once and never retry a rate limit or an explicit access refusal.
+  for(var registrationAttempt=0;registrationAttempt<2;registrationAttempt++){
+   try{
+    var identity=yield* hgRegister();
+    Object.assign(identity,{version_code:"71332",version_name:"7.1.3.32",manifest_version_code:"71332",update_version_code:"71332",host_abi:"arm64-v8a",dragon_device_type:"phone",pv_player:"71332",compliance_status:"0",need_personal_recommend:"1",player_so_load:"1",is_android_pad_screen:"0",ts:String(Math.floor(Date.now()/1000))});
+    var modern=yield* hgRequest('/novel/player/multi_video_model/v1/',{mixed_video_id_map:{'1004':[videoId]},biz_param:{detail_page_version:0,device_level:3,disable_digg_stat:false,need_all_video_definition:true,need_mp4_align:false,use_os_player:false,use_server_dns:false,video_platform:1024}},null,state,identity);
+    if(!Object.prototype.hasOwnProperty.call(modern,videoId))throw new Error('Wrong episode model');
+    return select(yield* hgModelChoices(hgModel(modern[videoId].video_model)),quality);
+   }catch(error){
+    if(error.httpStatus===429)throw error;
+    if(error.httpStatus===401||error.httpStatus===403)break;
+   }
+  }
  }
  var data=yield* hgRequest('/novel/player/video_model/v1/',{video_id:videoId,content_type:1,biz_param:{need_all_video_definition:true,video_platform:3}},null,state);
  return select(yield* hgModelChoices(hgModel(data.video_model)),quality);
