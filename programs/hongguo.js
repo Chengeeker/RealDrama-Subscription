@@ -9,12 +9,12 @@ function hgDeviceID(){var value="1";for(var i=0;i<15;i++)value+=String(Math.floo
 function* hgRequest(route,payload,extra,state,identity){
  var attempts=route.indexOf("video_model")>=0?2:3;
  for(var attempt=0;attempt<attempts;attempt++){
-  var now=Date.now(),params={aid:"8662",app_name:"novelread",version_code:"73532",version_name:"7.3.5.32",manifest_version_code:"73532",update_version_code:"73532",channel:"update_64",device_platform:"android",os:"android",ssmix:"a",device_type:"25053RT47C",device_brand:"Redmi",language:"zh",os_api:"36",os_version:"16",resolution:"1280*2772",dpi:"520",ac:"wifi",device_id:(state.deviceId=hgDeviceID()),iid:(state.installId=hgDeviceID()),_rticket:String(now)};
+  var now=Date.now(),params={aid:"8662",app_name:"novelread",version_code:"73532",version_name:"7.3.5.32",manifest_version_code:"73532",update_version_code:"73532",channel:"update_64",device_platform:"android",os:"android",ssmix:"a",device_type:"25053RT47C",device_brand:"Redmi",language:"zh",os_api:"36",os_version:"16",resolution:"1280*2772",dpi:"520",ac:"wifi",device_id:(state.deviceId=state.deviceId||hgDeviceID()),iid:(state.installId=state.installId||hgDeviceID()),_rticket:String(now)};
   Object.assign(params,extra||{},identity||{});
   var q=query(params),body=payload?JSON.stringify(payload):null,signed=typeof hongguoSign==="function"?JSON.parse(hongguoSign(JSON.stringify(params),body||"",now)):{query:q,headers:hgSign(q,body,now)};
   var headers=Object.assign({"User-Agent":HG_UA,"Accept":"application/json","X-XS-From-Web":"0","Sdk-Version":"2","Content-Type":"application/json; charset=utf-8"},signed.headers);
   if(identity)headers["User-Agent"]="com.phoenix.read/71532 (Linux; U; Android 9; SM-N9860; Build/PQ3A.190705.10241111;tt-ok/3.12.13.20)";
-  var text=yield* http((identity&&attempt?"https://api5-normal-hl.fqnovel.com":HG_BASE)+route+"?"+signed.query,{method:payload?"POST":"GET",body:body,headers:headers});
+  var text=yield* http((route.indexOf("video_model")>=0&&attempt?"https://api5-normal-hl.fqnovel.com":HG_BASE)+route+"?"+signed.query,{method:payload?"POST":"GET",body:body,headers:headers});
   if(!String(text||"").trim()){if(attempt+1<attempts)continue;throw new Error("Hongguo empty response");}
   var result=JSON.parse(text);
   if(result.status_code&&Number(result.status_code)!==0||result.code&&String(result.code)!=="0")throw new Error("Hongguo unavailable");

@@ -9,7 +9,7 @@
       "api": 1,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.1.6",
+      "version": "0.1.7",
       "credentialDomains": [],
       "description": "真人剧、漫剧、AI 剧；App、网页及备用公开播放接口",
       "id": "hongguo",
@@ -35,7 +35,7 @@
         "feedSeek"
       ],
       "url": "sources/hongguo.json",
-      "sha256": "ae509d9a94d84d5caf3368b794e7ca23b292709f6780bafc240a8990d3adc845"
+      "sha256": "f80439c49b546740c548db344d185555f812bef7a50cde09bd74860bb9815519"
     },
     {
       "schema": 1,

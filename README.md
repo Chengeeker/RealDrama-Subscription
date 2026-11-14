@@ -17,6 +17,10 @@ https://raw.githubusercontent.com/Chengeeker/RealDrama-Subscription/main/sources
 
 Replace `<source-id>` with an ID from the catalog. Available entries and capabilities are defined by the catalog and the installed packages. Packages imported from local files do not participate in online update checks.
 
+### Hongguo playback
+
+The Hongguo `0.1.7` development package retains a consistent device identity during retries and tries the second video-model API host when the first returns an empty HTTP 200 response. It is intended to reduce intermittent episode-resolution failures, not to bypass unavailable upstream content. Playback through the Android player still requires device verification.
+
 ### TikTok beta
 
 [TikTok beta](https://raw.githubusercontent.com/Chengeeker/RealDrama-Subscription/main/sources/tiktok.json) provides public popular videos, keyword search, and video playback through TikWM without account login. Search also accepts numeric video IDs and full TikTok video URLs. Photo posts and ads are excluded.
