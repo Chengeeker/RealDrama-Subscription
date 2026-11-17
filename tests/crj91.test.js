@@ -6,12 +6,11 @@ const vm = require("vm");
 const requests = [];
 const context = {
   requests,
-  resolveURL: (base, reference) => new URL(reference, base).toString(),
   query: (params) => Object.keys(params).sort().map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`).join("&"),
   url: (value) => typeof value === "string" && /^https:\/\//.test(value) ? value : "",
   http: function* (address, options) {
-    requests.push({address, headers: options.headers});
-    const response = yield {type: "http", url: address, headers: options.headers};
+    requests.push({address, headers: options.headers, method: options.method, body: options.body});
+    const response = yield {type: "http", url: address, headers: options.headers, method: options.method, body: options.body};
     if (!response || response.status !== 200) throw new Error("HTTP failed");
     return response.text;
   },
@@ -47,9 +46,12 @@ generator = context.sourceExecute("resolve", {
   chapter: {pageURL: "https://91crdj.com/duanju/123-sample/1/"},
 }, {});
 step = generator.next();
-assert.strictEqual(step.value.url, "https://91crdjai.com/videos/123/episodes/1/playback");
+assert.strictEqual(step.value.url, "https://91crdjai.com/api/videos/123/episodes/1/playback");
+assert.strictEqual(step.value.method, "POST");
+assert.strictEqual(step.value.body, "{}");
+assert.strictEqual(step.value.headers["Content-Type"], "application/json");
 assert.strictEqual(step.value.headers.Referer, "https://91crdjai.com/");
-step = generator.next({status: 200, text: JSON.stringify({data: {src: "https://media.example/video.m3u8"}})});
+step = generator.next({status: 200, text: JSON.stringify({status: 1, data: {manifest_method: "GET", streams: {main: "https://media.example/video.m3u8"}}})});
 assert.strictEqual(step.done, true);
 assert.strictEqual(step.value.url, "https://media.example/video.m3u8");
 assert.strictEqual(step.value.headers.Referer, "https://91crdjai.com/");

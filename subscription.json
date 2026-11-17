@@ -422,7 +422,7 @@
       "api": 1,
       "status": "draft",
       "engine": "javascript-generator-v1",
-      "version": "0.1.3",
+      "version": "0.1.4",
       "credentialDomains": [],
       "description": "可独立更新的本地站源程序",
       "id": "crj91",
@@ -440,7 +440,7 @@
         "feedSeek"
       ],
       "url": "sources/crj91.json",
-      "sha256": "4a1274eda74bf67a9c291377d4d06359ae354650dc07726d90f97b8d0e5cf75b"
+      "sha256": "fce1561674131bcdcda1d0084b93128e6066d40f7b9b9577c951988488193e46"
     },
     {
       "schema": 1,

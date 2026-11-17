@@ -21,6 +21,10 @@ Replace `<source-id>` with an ID from the catalog. Available entries and capabil
 
 Hongguo `0.1.8` removes the persistent synthetic device identity introduced in `0.1.7` and adds one bounded retry using a fresh legitimate registration when the App video-model request intermittently fails. A rate limit is terminal, and an explicit access denial does not trigger another registration attempt. The official website's public playback endpoint may refuse later episodes with HTTP 403; this is a content-availability restriction, not proof of a defective episode URL. This change improves recovery from transient failures but does not claim to unlock or restore every episode. Android playback still requires device verification.
 
+### 91 adult drama source
+
+`crj91` `0.1.4` replaces an undefined URL resolver bundled into earlier packages and switches episode playback lookup to the site's JSON POST endpoint. Live HTTP checks confirmed category listing, item details, and a returned HLS URL. Native Android playback has not yet been verified on a connected device.
+
 ### TikTok beta
 
 [TikTok beta](https://raw.githubusercontent.com/Chengeeker/RealDrama-Subscription/main/sources/tiktok.json) provides public popular videos, keyword search, and video playback through TikWM without account login. Search also accepts numeric video IDs and full TikTok video URLs. Photo posts and ads are excluded.
