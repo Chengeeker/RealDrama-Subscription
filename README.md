@@ -17,6 +17,10 @@ https://raw.githubusercontent.com/Chengeeker/RealDrama-Subscription/main/sources
 
 Replace `<source-id>` with an ID from the catalog. Available entries and capabilities are defined by the catalog and the installed packages. Packages imported from local files do not participate in online update checks.
 
+### Douyin playback (0.2.11)
+
+The Douyin bundle and its child packages now prefer H.264/AVC media over HEVC, remove duplicate and expired playback links, and refresh cached video URLs after two minutes or on an explicit retry. The original three-failure feed stop in the Android client is removed in RealDrama 2.3.12. Synthetic source tests pass; the current network environment returns `blocked` for Douyin's live catalog endpoint, so actual mobile playback remains unverified. Reimport or update the subscription after publication to activate these changes; the APK does not embed the online source package.
+
 ### Hongguo playback
 
 Hongguo `0.1.8` removes the persistent synthetic device identity introduced in `0.1.7` and adds one bounded retry using a fresh legitimate registration when the App video-model request intermittently fails. A rate limit is terminal, and an explicit access denial does not trigger another registration attempt. The official website's public playback endpoint may refuse later episodes with HTTP 403; this is a content-availability restriction, not proof of a defective episode URL. This change improves recovery from transient failures but does not claim to unlock or restore every episode. Android playback still requires device verification.
